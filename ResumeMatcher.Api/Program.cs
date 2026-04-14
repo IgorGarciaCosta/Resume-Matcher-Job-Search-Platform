@@ -13,7 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ── Dependency Injection ──────────────────────────────────────────────────────
 builder.Services.AddScoped<IPdfExtractorService, PdfExtractorService>();
 builder.Services.AddScoped<IJobScraperService, JobScraperService>();
-builder.Services.AddScoped<IAiAnalyzerService, MockAiAnalyzerService>(); // Trocar por OpenAiAnalyzerService quando tiver API key
+builder.Services.AddScoped<IAiAnalyzerService, GeminiAnalyzerService>();
 builder.Services.AddScoped<MatcherService>();
 
 // ── Controllers ───────────────────────────────────────────────────────────────
