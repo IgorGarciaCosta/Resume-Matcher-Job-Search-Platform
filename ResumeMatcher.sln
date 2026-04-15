@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResumeMatcher.Api", "ResumeMatcher.Api\ResumeMatcher.Api.csproj", "{22D01EBB-21F5-42DB-A9A0-B84C4B5062D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResumeMatcher.Api", "ResumeMatcher.Api.csproj", "{22D01EBB-21F5-42DB-A9A0-B84C4B5062D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

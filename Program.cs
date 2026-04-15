@@ -16,6 +16,13 @@ builder.Services.AddScoped<IJobScraperService, JobScraperService>();
 builder.Services.AddScoped<IAiAnalyzerService, GeminiAnalyzerService>();
 builder.Services.AddScoped<MatcherService>();
 
+// ── Job Search Providers ──────────────────────────────────────────────────────
+builder.Services.AddHttpClient<RemotiveJobSearchProvider>();
+builder.Services.AddHttpClient<ArbeitnowJobSearchProvider>();
+builder.Services.AddScoped<IJobSearchProvider, RemotiveJobSearchProvider>();
+builder.Services.AddScoped<IJobSearchProvider, ArbeitnowJobSearchProvider>();
+builder.Services.AddScoped<JobSearchService>();
+
 // ── Controllers ───────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 

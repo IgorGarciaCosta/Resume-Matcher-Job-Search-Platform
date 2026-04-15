@@ -1,3 +1,4 @@
+using System.ClientModel;
 using Microsoft.AspNetCore.Mvc;
 using ResumeMatcher.Api.Application.DTOs;
 using ResumeMatcher.Api.Application.Services;
@@ -56,15 +57,15 @@ public class MatcherController : ControllerBase
                 Status = StatusCodes.Status400BadRequest
             });
         }
+        catch (ClientResultException ex)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, new ProblemDetails
+            {
+                Title = "Erro na API de IA",
+                Detail = $"A API do Gemini retornou erro ({ex.Status}). Tente novamente em alguns instantes.",
+                Status = StatusCodes.Status502BadGateway
+            });
+        }
     }
 
-    /// <summary>
-    /// Health check simples da API.
-    /// </summary>
-    [HttpGet("health")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult Health()
-    {
-        return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
-    }
 }
