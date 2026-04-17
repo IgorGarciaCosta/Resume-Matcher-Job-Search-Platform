@@ -19,8 +19,12 @@ builder.Services.AddScoped<MatcherService>();
 // ── Job Search Providers ──────────────────────────────────────────────────────
 builder.Services.AddHttpClient<RemotiveJobSearchProvider>();
 builder.Services.AddHttpClient<ArbeitnowJobSearchProvider>();
+builder.Services.AddHttpClient<JobicyJobSearchProvider>();
+builder.Services.AddHttpClient<HimalayasJobSearchProvider>();
 builder.Services.AddScoped<IJobSearchProvider, RemotiveJobSearchProvider>();
 builder.Services.AddScoped<IJobSearchProvider, ArbeitnowJobSearchProvider>();
+builder.Services.AddScoped<IJobSearchProvider, JobicyJobSearchProvider>();
+builder.Services.AddScoped<IJobSearchProvider, HimalayasJobSearchProvider>();
 builder.Services.AddScoped<JobSearchService>();
 
 // ── Controllers ───────────────────────────────────────────────────────────────
