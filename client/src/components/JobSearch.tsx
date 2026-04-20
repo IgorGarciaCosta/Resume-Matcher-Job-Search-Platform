@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Search, MapPin, Wifi, Loader2, Briefcase } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Search, MapPin, Wifi, Loader2, Briefcase, SlidersHorizontal } from "lucide-react";
 import { searchJobs, type JobSearchResult } from "../services/api";
 import JobCard from "./JobCard";
 import styles from "./JobSearch.module.css";
@@ -14,6 +14,18 @@ export default function JobSearch() {
   const [totalCount, setTotalCount] = useState(0);
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
+        setFiltersOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,25 +69,47 @@ export default function JobSearch() {
             className={styles.input}
           />
         </div>
-        <div className={styles.inputGroup}>
-          <MapPin size={16} className={styles.inputIcon} />
-          <input
-            type="text"
-            placeholder="Location..."
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className={styles.input}
-          />
+        <div className={styles.filtersWrapper} ref={filtersRef}>
+          <button
+            type="button"
+            className={styles.filtersButton}
+            onClick={() => setFiltersOpen((v) => !v)}
+          >
+            <SlidersHorizontal size={16} />
+            Filters
+          </button>
+          {filtersOpen && (
+            <div className={styles.filtersDropdown}>
+              <div className={styles.filterField}>
+                <label className={styles.filterLabel}>
+                  <MapPin size={14} />
+                  Location
+                </label>
+                <div className={styles.inputGroup}>
+                  <MapPin size={16} className={styles.inputIcon} />
+                  <input
+                    type="text"
+                    placeholder="Location..."
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className={styles.input}
+                  />
+                </div>
+              </div>
+              <div className={styles.filterField}>
+                <label className={styles.toggle}>
+                  <input
+                    type="checkbox"
+                    checked={remoteOnly}
+                    onChange={(e) => setRemoteOnly(e.target.checked)}
+                  />
+                  <Wifi size={14} />
+                  <span>Remote only</span>
+                </label>
+              </div>
+            </div>
+          )}
         </div>
-        <label className={styles.toggle}>
-          <input
-            type="checkbox"
-            checked={remoteOnly}
-            onChange={(e) => setRemoteOnly(e.target.checked)}
-          />
-          <Wifi size={14} />
-          <span>Remote only</span>
-        </label>
         <button type="submit" className={styles.button} disabled={loading}>
           {loading ? (
             <Loader2 size={16} className={styles.spin} />
