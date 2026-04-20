@@ -1,12 +1,45 @@
-import { ExternalLink, Building2, MapPin, Tag } from "lucide-react";
+import {
+  ExternalLink,
+  Building2,
+  MapPin,
+  Tag,
+  Wifi,
+  Building,
+  Shuffle,
+} from "lucide-react";
 import type { JobSearchResult } from "../services/api";
 import styles from "./JobCard.module.css";
+
+function getWorkMode(job: JobSearchResult) {
+  const text =
+    `${job.title} ${job.location} ${job.description} ${job.tags.join(" ")}`.toLowerCase();
+  if (text.includes("hybrid"))
+    return { label: "Hybrid", icon: Shuffle, className: styles.workModeHybrid };
+  if (
+    text.includes("remote") ||
+    text.includes("anywhere") ||
+    text.includes("work from home")
+  )
+    return { label: "Remote", icon: Wifi, className: styles.workModeRemote };
+  if (
+    text.includes("on-site") ||
+    text.includes("onsite") ||
+    text.includes("in-office")
+  )
+    return {
+      label: "On-site",
+      icon: Building,
+      className: styles.workModeOnsite,
+    };
+  return null;
+}
 
 interface JobCardProps {
   job: JobSearchResult;
 }
 
 export default function JobCard({ job }: JobCardProps) {
+  const workMode = getWorkMode(job);
   return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
@@ -31,6 +64,11 @@ export default function JobCard({ job }: JobCardProps) {
         </span>
         {job.salary && <span className={styles.salary}>{job.salary}</span>}
         {job.jobType && <span className={styles.jobType}>{job.jobType}</span>}
+        {workMode && (
+          <span className={`${styles.workMode} ${workMode.className}`}>
+            <workMode.icon size={12} /> {workMode.label}
+          </span>
+        )}
         <span className={styles.source}>{job.source}</span>
       </div>
       <p className={styles.description}>

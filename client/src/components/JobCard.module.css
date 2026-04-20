@@ -64,6 +64,31 @@
   font-size: 0.75rem;
 }
 
+.workMode {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.workModeRemote {
+  background: var(--success-muted);
+  color: var(--success);
+}
+
+.workModeOnsite {
+  background: var(--warning-muted);
+  color: var(--warning);
+}
+
+.workModeHybrid {
+  background: var(--accent-muted);
+  color: var(--accent);
+}
+
 .description {
   font-size: 0.85rem;
   color: var(--text-secondary);
