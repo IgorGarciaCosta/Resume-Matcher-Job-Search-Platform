@@ -30,6 +30,19 @@ public class JobSearchService
             errors.AddRange(result.Errors);
         }
 
+        // Filter by location if specified (safety-net for providers that don't filter server-side)
+        if (!string.IsNullOrWhiteSpace(request.Location))
+        {
+            var loc = request.Location;
+            allJobs = allJobs.Where(j =>
+                string.IsNullOrWhiteSpace(j.Location) ||
+                j.Location.Contains(loc, StringComparison.OrdinalIgnoreCase) ||
+                j.Location.Contains("Remote", StringComparison.OrdinalIgnoreCase) ||
+                j.Location.Contains("Worldwide", StringComparison.OrdinalIgnoreCase) ||
+                j.Location.Contains("Anywhere", StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+
         // Deduplicate by title + company (case-insensitive)
         var deduplicated = allJobs
             .GroupBy(j => $"{j.Title.ToLowerInvariant()}|{j.Company.ToLowerInvariant()}")

@@ -28,13 +28,14 @@ public class JSearchJobSearchProvider : IJobSearchProvider
         var pageSize = Math.Clamp(request.PageSize, 1, 20);
         var page = Math.Max(request.Page, 1);
 
-        var url = $"search?query={Uri.EscapeDataString(query)}&page={page}&num_pages=1";
+        var searchQuery = !string.IsNullOrWhiteSpace(request.Location)
+            ? $"{query} in {request.Location}"
+            : query;
+
+        var url = $"search?query={Uri.EscapeDataString(searchQuery)}&page={page}&num_pages=1";
 
         if (request.RemoteOnly)
             url += "&remote_jobs_only=true";
-
-        if (!string.IsNullOrWhiteSpace(request.Location))
-            url += $"&query={Uri.EscapeDataString(query + " in " + request.Location)}";
 
         using var msg = new HttpRequestMessage(HttpMethod.Get, url);
         msg.Headers.Add("X-RapidAPI-Key", _apiKey);

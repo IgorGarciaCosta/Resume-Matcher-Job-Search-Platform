@@ -45,6 +45,16 @@ public partial class RemotiveJobSearchProvider : IJobSearchProvider
             JobType = j.JobType
         }).ToList();
 
+        if (!string.IsNullOrWhiteSpace(request.Location))
+        {
+            var loc = request.Location;
+            jobs = jobs.Where(j =>
+                j.Location.Contains(loc, StringComparison.OrdinalIgnoreCase) ||
+                j.Location.Equals("Worldwide", StringComparison.OrdinalIgnoreCase) ||
+                j.Location.Equals("Anywhere", StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+
         return new JobSearchResponseDto
         {
             Jobs = jobs,

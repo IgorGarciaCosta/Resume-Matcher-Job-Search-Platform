@@ -63,11 +63,18 @@ public class GeminiAnalyzerService : IAiAnalyzerService
         var completion = await _chatClient.CompleteChatAsync(messages);
         var responseText = completion.Value.Content[0].Text;
 
-        // Remove possíveis code fences caso o modelo retorne ```json ... ```
+        // Remove possíveis code fences e texto extra fora do JSON
         responseText = responseText
             .Replace("```json", "")
             .Replace("```", "")
             .Trim();
+
+        // Extrai apenas o objeto JSON, ignorando texto antes/depois
+        var jsonStart = responseText.IndexOf('{');
+        var jsonEnd = responseText.LastIndexOf('}');
+        if (jsonStart < 0 || jsonEnd < 0 || jsonEnd <= jsonStart)
+            throw new InvalidOperationException("Resposta do Gemini não contém JSON válido.");
+        responseText = responseText[jsonStart..(jsonEnd + 1)];
 
         var parsed = JsonSerializer.Deserialize<GeminiMatchResponse>(responseText,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
