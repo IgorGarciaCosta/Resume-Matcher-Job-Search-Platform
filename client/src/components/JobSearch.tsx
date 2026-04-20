@@ -20,6 +20,9 @@ export default function JobSearch() {
     setLoading(true);
     setError("");
     setSearched(true);
+    setJobs([]);
+    setSources([]);
+    setTotalCount(0);
     try {
       const res = await searchJobs({ query, location, remoteOnly });
       setJobs(res.jobs);
