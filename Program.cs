@@ -21,10 +21,16 @@ builder.Services.AddHttpClient<RemotiveJobSearchProvider>();
 builder.Services.AddHttpClient<ArbeitnowJobSearchProvider>();
 builder.Services.AddHttpClient<JobicyJobSearchProvider>();
 builder.Services.AddHttpClient<HimalayasJobSearchProvider>();
+builder.Services.AddHttpClient<JSearchJobSearchProvider>();
+builder.Services.AddHttpClient<AdzunaJobSearchProvider>();
+builder.Services.AddHttpClient<TheMuseJobSearchProvider>();
 builder.Services.AddScoped<IJobSearchProvider, RemotiveJobSearchProvider>();
 builder.Services.AddScoped<IJobSearchProvider, ArbeitnowJobSearchProvider>();
 builder.Services.AddScoped<IJobSearchProvider, JobicyJobSearchProvider>();
 builder.Services.AddScoped<IJobSearchProvider, HimalayasJobSearchProvider>();
+builder.Services.AddScoped<IJobSearchProvider, JSearchJobSearchProvider>();
+builder.Services.AddScoped<IJobSearchProvider, AdzunaJobSearchProvider>();
+builder.Services.AddScoped<IJobSearchProvider, TheMuseJobSearchProvider>();
 builder.Services.AddScoped<JobSearchService>();
 
 // ── Controllers ───────────────────────────────────────────────────────────────
