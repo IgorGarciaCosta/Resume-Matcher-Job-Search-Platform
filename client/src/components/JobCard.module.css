@@ -1,0 +1,88 @@
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: border-color 0.2s;
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.jobTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.link {
+  color: var(--accent);
+  flex-shrink: 0;
+  padding: 4px;
+}
+
+.jobMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 8px 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.jobMeta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.salary {
+  color: var(--success);
+  font-weight: 500;
+}
+
+.jobType {
+  background: var(--accent-muted);
+  color: var(--accent);
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.source {
+  background: var(--bg-input);
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--text-muted);
+}
+
+.tag {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
