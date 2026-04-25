@@ -29,6 +29,13 @@ export interface MatchResult {
   improvementSuggestions: string;
 }
 
+export class AiServiceError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AiServiceError";
+  }
+}
+
 export async function searchJobs(params: {
   query?: string;
   location?: string;
@@ -63,6 +70,11 @@ export async function analyzeResume(data: {
     body: formData,
   });
   if (!res.ok) {
+    if (res.status === 502) {
+      throw new AiServiceError(
+        "Our AI service is temporarily unavailable. Please try again in a few moments."
+      );
+    }
     const text = await res.text();
     throw new Error(text || `Analysis failed: ${res.statusText}`);
   }

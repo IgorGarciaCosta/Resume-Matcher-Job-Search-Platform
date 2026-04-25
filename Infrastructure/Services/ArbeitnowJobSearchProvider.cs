@@ -60,7 +60,7 @@ public partial class ArbeitnowJobSearchProvider : IJobSearchProvider
             Description = StripHtml(j.Description ?? string.Empty),
             Url = j.Url ?? string.Empty,
             Salary = j.Salary,
-            PostedAt = DateTimeOffset.TryParse(j.CreatedAt, out var dt) ? dt.UtcDateTime : null,
+            PostedAt = j.CreatedAt is not null ? DateTimeOffset.FromUnixTimeSeconds(j.CreatedAt.Value).UtcDateTime : null,
             Source = ProviderName,
             Tags = j.Tags ?? [],
             JobType = j.Remote == true ? "remote" : null
@@ -128,7 +128,7 @@ public partial class ArbeitnowJobSearchProvider : IJobSearchProvider
         public string? Location { get; set; }
 
         [JsonPropertyName("created_at")]
-        public string? CreatedAt { get; set; }
+        public long? CreatedAt { get; set; }
 
         [JsonPropertyName("salary")]
         public string? Salary { get; set; }

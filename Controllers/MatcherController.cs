@@ -1,4 +1,5 @@
 using System.ClientModel;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using ResumeMatcher.Api.Application.DTOs;
 using ResumeMatcher.Api.Application.Services;
@@ -63,6 +64,15 @@ public class MatcherController : ControllerBase
             {
                 Title = "Erro na API de IA",
                 Detail = $"A API do Gemini retornou erro ({ex.Status}). Tente novamente em alguns instantes.",
+                Status = StatusCodes.Status502BadGateway
+            });
+        }
+        catch (JsonException)
+        {
+            return StatusCode(StatusCodes.Status502BadGateway, new ProblemDetails
+            {
+                Title = "Erro na API de IA",
+                Detail = "A IA retornou uma resposta inválida. Tente novamente em alguns instantes.",
                 Status = StatusCodes.Status502BadGateway
             });
         }

@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using ResumeMatcher.Api.Application.DTOs;
 using ResumeMatcher.Api.Application.Interfaces;
@@ -37,7 +38,11 @@ public class AdzunaJobSearchProvider : IJobSearchProvider
         if (!string.IsNullOrWhiteSpace(request.Location))
             url += $"&where={Uri.EscapeDataString(request.Location)}";
 
-        var response = await _httpClient.GetFromJsonAsync<AdzunaApiResponse>(url, ct);
+        // Read as string to avoid .NET encoding issue with Adzuna's 'utf8' charset header
+        var httpResponse = await _httpClient.GetAsync(url, ct);
+        httpResponse.EnsureSuccessStatusCode();
+        var json = await httpResponse.Content.ReadAsStringAsync(ct);
+        var response = JsonSerializer.Deserialize<AdzunaApiResponse>(json);
 
         if (response?.Results is null)
             return new JobSearchResponseDto { Page = page, PageSize = pageSize, Sources = [ProviderName] };

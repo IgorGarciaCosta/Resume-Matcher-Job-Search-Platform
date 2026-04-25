@@ -1,5 +1,6 @@
 using System.ClientModel;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using OpenAI;
 using OpenAI.Chat;
 using ResumeMatcher.Api.Application.DTOs;
@@ -31,19 +32,16 @@ public class GeminiAnalyzerService : IAiAnalyzerService
     {
         var systemPrompt = """
             You are an expert resume-job matching analyst.
-            Analyze the resume against the job description and respond ONLY with valid JSON (no markdown, no code fences).
+            Analyze the resume against the job description and respond ONLY with a single valid JSON object.
+            Do NOT include any text, explanation, or markdown outside the JSON.
+            All string values must be on a single line (use \\n for line breaks, never raw newlines inside strings).
             Use this exact structure:
-            {
-              "score": <integer 0 to 100>,
-              "matchingKeywords": ["keyword1", "keyword2"],
-              "missingKeywords": ["keyword1", "keyword2"],
-              "improvementSuggestions": "suggestions text in Portuguese (pt-BR)"
-            }
+            {"score": 75, "matchingKeywords": ["keyword1"], "missingKeywords": ["keyword1"], "improvementSuggestions": "suggestions here"}
             Rules:
-            - score: percentage of how well the resume fits the job (0 = no match, 100 = perfect)
+            - score: integer 0 to 100, percentage of how well the resume fits the job
             - matchingKeywords: skills/technologies found in BOTH resume and job
             - missingKeywords: skills/technologies in the job but NOT in the resume
-            - improvementSuggestions: actionable advice in pt-BR on how to improve the resume for this job
+            - improvementSuggestions: a single string with actionable advice in English on how to improve the resume for this job
             """;
 
         var userPrompt = $"""
@@ -60,7 +58,12 @@ public class GeminiAnalyzerService : IAiAnalyzerService
             new UserChatMessage(userPrompt)
         };
 
-        var completion = await _chatClient.CompleteChatAsync(messages);
+        var completionOptions = new ChatCompletionOptions
+        {
+            ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat()
+        };
+
+        var completion = await _chatClient.CompleteChatAsync(messages, completionOptions);
         var responseText = completion.Value.Content[0].Text;
 
         // Remove possíveis code fences e texto extra fora do JSON
@@ -69,15 +72,22 @@ public class GeminiAnalyzerService : IAiAnalyzerService
             .Replace("```", "")
             .Trim();
 
-        // Extrai apenas o objeto JSON, ignorando texto antes/depois
-        var jsonStart = responseText.IndexOf('{');
-        var jsonEnd = responseText.LastIndexOf('}');
-        if (jsonStart < 0 || jsonEnd < 0 || jsonEnd <= jsonStart)
-            throw new InvalidOperationException("Resposta do Gemini não contém JSON válido.");
-        responseText = responseText[jsonStart..(jsonEnd + 1)];
+        // Extrai o objeto JSON usando contagem balanceada de chaves
+        responseText = ExtractBalancedJson(responseText);
 
-        var parsed = JsonSerializer.Deserialize<GeminiMatchResponse>(responseText,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        GeminiMatchResponse? parsed;
+        try
+        {
+            parsed = JsonSerializer.Deserialize<GeminiMatchResponse>(responseText,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+        catch (JsonException)
+        {
+            // Tenta sanitizar: remove newlines dentro de strings JSON
+            var sanitized = Regex.Replace(responseText, @"(?<=:""[^""]*?)\r?\n(?=[^""]*?"")", "\\n");
+            parsed = JsonSerializer.Deserialize<GeminiMatchResponse>(sanitized,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
 
         return new MatchResultDto
         {
@@ -94,5 +104,40 @@ public class GeminiAnalyzerService : IAiAnalyzerService
         public List<string> MatchingKeywords { get; set; } = [];
         public List<string> MissingKeywords { get; set; } = [];
         public string ImprovementSuggestions { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Extracts the first balanced JSON object from the response text,
+    /// properly handling nested braces and quoted strings.
+    /// </summary>
+    private static string ExtractBalancedJson(string text)
+    {
+        var start = text.IndexOf('{');
+        if (start < 0)
+            throw new InvalidOperationException("Resposta do Gemini não contém JSON válido.");
+
+        var depth = 0;
+        var inString = false;
+        var escape = false;
+
+        for (var i = start; i < text.Length; i++)
+        {
+            var c = text[i];
+
+            if (escape) { escape = false; continue; }
+            if (c == '\\' && inString) { escape = true; continue; }
+            if (c == '"') { inString = !inString; continue; }
+            if (inString) continue;
+
+            if (c == '{') depth++;
+            else if (c == '}')
+            {
+                depth--;
+                if (depth == 0)
+                    return text[start..(i + 1)];
+            }
+        }
+
+        throw new InvalidOperationException("Resposta do Gemini não contém JSON válido.");
     }
 }
