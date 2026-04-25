@@ -20,6 +20,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-primary);
+  text-decoration: none;
 }
 
 .logoIcon {
@@ -37,9 +38,6 @@
 
 .main {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
   padding: 28px 32px;
   max-width: 1400px;
   width: 100%;
@@ -48,7 +46,6 @@
 
 @media (max-width: 900px) {
   .main {
-    grid-template-columns: 1fr;
     padding: 16px;
   }
 }
