@@ -11,6 +11,7 @@ An intelligent full-stack application that aggregates remote job listings from *
 ## Features
 
 ### Job Search
+
 - Search across **7 job boards simultaneously** — Remotive, Arbeitnow, Jobicy, Himalayas, JSearch, Adzuna, and The Muse
 - Results are **deduplicated** by title + company across all sources
 - Filter by **keyword**, **location**, and **remote-only** positions
@@ -18,6 +19,7 @@ An intelligent full-stack application that aggregates remote job listings from *
 - Graceful handling of provider failures — working sources still return results
 
 ### Resume Analyzer
+
 - Upload a **PDF resume** and provide a job description (via URL or pasted text)
 - AI returns a **match score (0–100)** with color-coded feedback
 - Lists **matching keywords** found in both resume and job
@@ -26,15 +28,15 @@ An intelligent full-stack application that aggregates remote job listings from *
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Backend** | ASP.NET Core 9, C# |
-| **Frontend** | React 19, TypeScript 6, Vite 8 |
-| **Database** | SQLite + Entity Framework Core 9 |
-| **AI** | Google Gemini (`gemini-2.5-flash`) |
-| **PDF Parsing** | PdfPig |
-| **Web Scraping** | HtmlAgilityPack |
-| **Styling** | CSS Modules + Lucide React icons |
+| Layer            | Technology                         |
+| ---------------- | ---------------------------------- |
+| **Backend**      | ASP.NET Core 9, C#                 |
+| **Frontend**     | React 19, TypeScript 6, Vite 8     |
+| **Database**     | SQLite + Entity Framework Core 9   |
+| **AI**           | Google Gemini (`gemini-2.5-flash`) |
+| **PDF Parsing**  | PdfPig                             |
+| **Web Scraping** | HtmlAgilityPack                    |
+| **Styling**      | CSS Modules + Lucide React icons   |
 
 ## Project Structure
 
@@ -115,13 +117,13 @@ The frontend starts at **http://localhost:5173**.
 GET /api/jobsearch/search
 ```
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `query` | string | — | Job title or keyword |
-| `location` | string | — | Location filter |
-| `remoteOnly` | bool | `false` | Show only remote positions |
-| `page` | int | `1` | Page number |
-| `pageSize` | int | `20` | Results per page (max 100) |
+| Parameter    | Type   | Default | Description                |
+| ------------ | ------ | ------- | -------------------------- |
+| `query`      | string | —       | Job title or keyword       |
+| `location`   | string | —       | Location filter            |
+| `remoteOnly` | bool   | `false` | Show only remote positions |
+| `page`       | int    | `1`     | Page number                |
+| `pageSize`   | int    | `20`    | Results per page (max 100) |
 
 ### Resume Analysis
 
@@ -130,11 +132,11 @@ POST /api/matcher/analyze
 Content-Type: multipart/form-data
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `ResumeFile` | file | Yes | PDF resume file |
-| `JobUrl` | string | No | URL to a job posting (auto-scraped) |
-| `JobText` | string | No | Raw job description text |
+| Field        | Type   | Required | Description                         |
+| ------------ | ------ | -------- | ----------------------------------- |
+| `ResumeFile` | file   | Yes      | PDF resume file                     |
+| `JobUrl`     | string | No       | URL to a job posting (auto-scraped) |
+| `JobText`    | string | No       | Raw job description text            |
 
 **Response:**
 
@@ -149,15 +151,15 @@ Content-Type: multipart/form-data
 
 ## Job Search Providers
 
-| Provider | Website |
-|----------|---------|
-| Remotive | remotive.com |
+| Provider  | Website       |
+| --------- | ------------- |
+| Remotive  | remotive.com  |
 | Arbeitnow | arbeitnow.com |
-| Jobicy | jobicy.com |
+| Jobicy    | jobicy.com    |
 | Himalayas | himalayas.app |
-| JSearch | jsearch.io |
-| Adzuna | adzuna.com |
-| The Muse | themuse.com |
+| JSearch   | jsearch.io    |
+| Adzuna    | adzuna.com    |
+| The Muse  | themuse.com   |
 
 ## License
 

@@ -1,5 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, MapPin, Wifi, Loader2, Briefcase, SlidersHorizontal } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  Wifi,
+  Loader2,
+  Briefcase,
+  SlidersHorizontal,
+} from "lucide-react";
 import { searchJobs, type JobSearchResult } from "../services/api";
 import JobCard from "./JobCard";
 import styles from "./JobSearch.module.css";
@@ -19,7 +26,10 @@ export default function JobSearch() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
+      if (
+        filtersRef.current &&
+        !filtersRef.current.contains(e.target as Node)
+      ) {
         setFiltersOpen(false);
       }
     };
