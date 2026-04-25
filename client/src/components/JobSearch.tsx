@@ -6,6 +6,8 @@ import {
   Loader2,
   Briefcase,
   SlidersHorizontal,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { searchJobs, type JobSearchResult } from "../services/api";
 import JobCard from "./JobCard";
@@ -22,7 +24,15 @@ export default function JobSearch() {
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const filtersRef = useRef<HTMLDivElement>(null);
+
+  const JOBS_PER_PAGE = 5;
+  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
+  const paginatedJobs = jobs.slice(
+    (currentPage - 1) * JOBS_PER_PAGE,
+    currentPage * JOBS_PER_PAGE,
+  );
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -45,8 +55,14 @@ export default function JobSearch() {
     setJobs([]);
     setSources([]);
     setTotalCount(0);
+    setCurrentPage(1);
     try {
-      const res = await searchJobs({ query, location, remoteOnly });
+      const res = await searchJobs({
+        query,
+        location,
+        remoteOnly,
+        pageSize: 200,
+      });
       setJobs(res.jobs);
       setSources(res.sources);
       setTotalCount(res.totalCount);
@@ -151,10 +167,34 @@ export default function JobSearch() {
       )}
 
       <div className={styles.results}>
-        {jobs.map((job, i) => (
+        {paginatedJobs.map((job, i) => (
           <JobCard key={i} job={job} />
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            className={styles.pageButton}
+            onClick={() => setCurrentPage((p) => p - 1)}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft size={16} />
+            Previous
+          </button>
+          <span className={styles.pageInfo}>
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            className={styles.pageButton}
+            onClick={() => setCurrentPage((p) => p + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
     </section>
   );
 }
