@@ -16,6 +16,8 @@ import { useScoreAnimation } from "./hooks/useScoreAnimation";
 import ScoreRing from "./ScoreRing";
 import AiErrorCard from "./AiErrorCard";
 import KeywordsList from "./KeywordsList";
+import LoadingAnimation from "./LoadingAnimation";
+import AnalyzingCharacter from "./AnalyzingCharacter";
 import styles from "./ResumeAnalyzer.module.css";
 
 export default function ResumeAnalyzer() {
@@ -169,10 +171,9 @@ export default function ResumeAnalyzer() {
       {error && isAiError && <AiErrorCard />}
 
       {loading && (
-        <div className={styles.loadingState}>
-          <Loader2 size={28} className={styles.spin} />
-          <span>Analyzing your resume with AI...</span>
-        </div>
+        <LoadingAnimation message="Analyzing your resume with AI">
+          <AnalyzingCharacter />
+        </LoadingAnimation>
       )}
 
       {result && (

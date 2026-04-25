@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { searchJobs, type JobSearchResult } from "../services/api";
 import JobCard from "./JobCard";
+import LoadingAnimation from "./LoadingAnimation";
+import SearchingCharacter from "./SearchingCharacter";
 import styles from "./JobSearch.module.css";
 
 export default function JobSearch() {
@@ -160,10 +162,9 @@ export default function JobSearch() {
       )}
 
       {loading && (
-        <div className={styles.loadingState}>
-          <Loader2 size={28} className={styles.spin} />
-          <span>Searching job boards...</span>
-        </div>
+        <LoadingAnimation message="Searching job boards">
+          <SearchingCharacter />
+        </LoadingAnimation>
       )}
 
       <div className={styles.results}>
