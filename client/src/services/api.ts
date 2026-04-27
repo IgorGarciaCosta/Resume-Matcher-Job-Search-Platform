@@ -1,5 +1,80 @@
 const API_BASE = "http://localhost:5266/api";
 
+// ── Auth Types ────────────────────────────────────────────────────────────────
+
+/** Authenticated user profile returned by the backend. */
+export interface User {
+  id: string;
+  email: string;
+  fullName: string;
+}
+
+/** Standardized backend response for login/register operations. */
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  user: User | null;
+}
+
+// ── Auth API ──────────────────────────────────────────────────────────────────
+
+/** Creates a new account and sets the JWT cookie via credentials: "include". */
+export async function register(data: {
+  email: string;
+  password: string;
+  fullName: string;
+}): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message || "Registration failed");
+  return json;
+}
+
+/** Authenticates with email/password and sets the JWT cookie. */
+export async function login(data: {
+  email: string;
+  password: string;
+}): Promise<AuthResponse> {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message || "Login failed");
+  return json;
+}
+
+/** Clears the JWT cookie on the server, ending the session. */
+export async function logout(): Promise<void> {
+  await fetch(`${API_BASE}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+}
+
+/** Fetches the current user from the JWT cookie. Throws if not authenticated. */
+export async function getMe(): Promise<User> {
+  const res = await fetch(`${API_BASE}/auth/me`, {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Not authenticated");
+  return res.json();
+}
+
+/** Returns the backend URL that initiates an OAuth redirect for the given provider. */
+export function getExternalLoginUrl(provider: string): string {
+  return `http://localhost:5266/api/auth/external/${provider}`;
+}
+
+// ── Job Search Types ──────────────────────────────────────────────────────────
+
 export interface JobSearchResult {
   title: string;
   company: string;
@@ -50,7 +125,9 @@ export async function searchJobs(params: {
   if (params.page) searchParams.set("page", params.page.toString());
   if (params.pageSize) searchParams.set("pageSize", params.pageSize.toString());
 
-  const res = await fetch(`${API_BASE}/jobsearch/search?${searchParams}`);
+  const res = await fetch(`${API_BASE}/jobsearch/search?${searchParams}`, {
+    credentials: "include",
+  });
   if (!res.ok) throw new Error(`Job search failed: ${res.statusText}`);
   return res.json();
 }
@@ -67,6 +144,7 @@ export async function analyzeResume(data: {
 
   const res = await fetch(`${API_BASE}/matcher/analyze`, {
     method: "POST",
+    credentials: "include",
     body: formData,
   });
   if (!res.ok) {
