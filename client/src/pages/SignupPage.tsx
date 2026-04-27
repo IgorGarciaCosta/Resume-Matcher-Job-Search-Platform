@@ -7,7 +7,7 @@ import styles from "./AuthPage.module.css";
 
 /** Account creation page with name/email/password form and OAuth buttons. Redirects to / on success. */
 export default function SignupPage() {
-  const { register, loginWithGoogle, loginWithLinkedIn } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const [fullName, setFullName] = useState("");
@@ -114,13 +114,6 @@ export default function SignupPage() {
             onClick={loginWithGoogle}
           >
             Google
-          </button>
-          <button
-            type="button"
-            className={styles.oauthBtn}
-            onClick={loginWithLinkedIn}
-          >
-            LinkedIn
           </button>
         </div>
 

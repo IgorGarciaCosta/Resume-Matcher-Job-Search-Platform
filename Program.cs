@@ -64,11 +64,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-})
-.AddLinkedIn(options =>
-{
-    options.ClientId = builder.Configuration["Authentication:LinkedIn:ClientId"]!;
-    options.ClientSecret = builder.Configuration["Authentication:LinkedIn:ClientSecret"]!;
 });
 
 // ── Dependency Injection ──────────────────────────────────────────────────────

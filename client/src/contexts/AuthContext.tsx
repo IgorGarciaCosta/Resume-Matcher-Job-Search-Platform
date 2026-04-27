@@ -27,7 +27,6 @@ interface AuthContextType {
   ) => Promise<void>;
   logout: () => Promise<void>;
   loginWithGoogle: () => void;
-  loginWithLinkedIn: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -78,10 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = getExternalLoginUrl("Google");
   };
 
-  const loginWithLinkedIn = () => {
-    window.location.href = getExternalLoginUrl("LinkedIn");
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -92,7 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         loginWithGoogle,
-        loginWithLinkedIn,
       }}
     >
       {children}

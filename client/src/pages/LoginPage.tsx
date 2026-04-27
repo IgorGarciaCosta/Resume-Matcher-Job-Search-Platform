@@ -7,7 +7,7 @@ import styles from "./AuthPage.module.css";
 
 /** Email/password sign-in page with Google and LinkedIn OAuth buttons. Redirects to / on success. */
 export default function LoginPage() {
-  const { login, loginWithGoogle, loginWithLinkedIn } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -96,13 +96,6 @@ export default function LoginPage() {
             onClick={loginWithGoogle}
           >
             Google
-          </button>
-          <button
-            type="button"
-            className={styles.oauthBtn}
-            onClick={loginWithLinkedIn}
-          >
-            LinkedIn
           </button>
         </div>
 
