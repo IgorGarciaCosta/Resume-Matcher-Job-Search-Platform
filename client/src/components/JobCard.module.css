@@ -3,11 +3,18 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 }
 
 .card:hover {
   border-color: var(--accent);
+}
+
+.cardSelected {
+  border-color: var(--accent);
+  background: var(--accent-muted);
+  box-shadow: 0 0 0 1px var(--accent), 0 2px 12px rgba(124, 92, 252, 0.15);
 }
 
 .cardHeader {

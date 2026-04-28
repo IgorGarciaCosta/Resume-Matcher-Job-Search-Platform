@@ -36,12 +36,26 @@ function getWorkMode(job: JobSearchResult) {
 
 interface JobCardProps {
   job: JobSearchResult;
+  selected?: boolean;
+  onSelect?: () => void;
 }
 
-export default function JobCard({ job }: JobCardProps) {
+export default function JobCard({ job, selected, onSelect }: JobCardProps) {
   const workMode = getWorkMode(job);
   return (
-    <div className={styles.card}>
+    <div
+      className={`${styles.card} ${selected ? styles.cardSelected : ""}`}
+      onClick={onSelect}
+      role={onSelect ? "button" : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      onKeyDown={
+        onSelect
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") onSelect();
+            }
+          : undefined
+      }
+    >
       <div className={styles.cardHeader}>
         <h3 className={styles.jobTitle}>{job.title}</h3>
         {job.url && (
