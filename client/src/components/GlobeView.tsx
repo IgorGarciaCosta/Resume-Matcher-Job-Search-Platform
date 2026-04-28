@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo, memo } from "react";
 import { MeshPhongMaterial } from "three";
 import type { CountryCoord } from "../data/countryCoordinates";
 import styles from "./GlobeView.module.css";
@@ -42,7 +42,7 @@ const globeMaterial = new MeshPhongMaterial({
   opacity: 0.95,
 });
 
-export default function GlobeView({
+export default memo(function GlobeView({
   selectedCountry,
   onCountryClick,
 }: GlobeViewProps) {
@@ -53,6 +53,8 @@ export default function GlobeView({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
   const [hoveredCountry, setHoveredCountry] = useState<GeoFeature | null>(null);
+  const [clickedIso, setClickedIso] = useState<string | null>(null);
+  const [clickedName, setClickedName] = useState("");
 
   // Dynamically import react-globe.gl (heavy dep, code-split)
   useEffect(() => {
@@ -83,6 +85,9 @@ export default function GlobeView({
   // Use the ISO code directly from the resolved country data
   const selectedIso = selectedCountry?.iso ?? null;
 
+  // The active highlight ISO: job-selected takes priority, then globe-clicked
+  const activeIso = selectedIso ?? clickedIso;
+
   // Animate globe to selected country
   useEffect(() => {
     if (!selectedCountry || !globeRef.current) return;
@@ -103,17 +108,54 @@ export default function GlobeView({
       const f = feat as GeoFeature;
       const iso = f.properties.ISO_A2;
       const name = f.properties.NAME || f.properties.ADMIN || "";
-      if (iso && iso !== "-99" && onCountryClick) {
-        onCountryClick(iso, name);
+      if (iso && iso !== "-99") {
+        setClickedIso(iso);
+        setClickedName(name);
+        // Compute centroid from polygon coordinates
+        if (globeRef.current && f.geometry.coordinates) {
+          const coords = f.geometry.coordinates as number[][][];
+          const ring =
+            f.geometry.type === "MultiPolygon"
+              ? (coords as unknown as number[][][][])[0][0]
+              : coords[0];
+          if (ring && ring.length > 0) {
+            let sumLng = 0,
+              sumLat = 0;
+            for (const pt of ring) {
+              sumLng += pt[0];
+              sumLat += pt[1];
+            }
+            const globe = globeRef.current as {
+              pointOfView: (
+                c: { lat: number; lng: number; altitude: number },
+                ms: number,
+              ) => void;
+            };
+            globe.pointOfView(
+              {
+                lat: sumLat / ring.length,
+                lng: sumLng / ring.length,
+                altitude: 1.8,
+              },
+              1200,
+            );
+          }
+        }
+        if (onCountryClick) onCountryClick(iso, name);
       }
     },
     [onCountryClick],
   );
 
+  const handleGlobeClick = useCallback(() => {
+    setClickedIso(null);
+    setClickedName("");
+  }, []);
+
   const getPolygonCapColor = useCallback(
     (feat: object) => {
       const f = feat as GeoFeature;
-      if (selectedIso && f.properties.ISO_A2 === selectedIso)
+      if (activeIso && f.properties.ISO_A2 === activeIso)
         return HIGHLIGHT_COLOR;
       if (
         hoveredCountry &&
@@ -123,38 +165,37 @@ export default function GlobeView({
       }
       return COUNTRY_COLOR;
     },
-    [selectedIso, hoveredCountry],
+    [activeIso, hoveredCountry],
   );
 
   const getPolygonSideColor = useCallback(
     (feat: object) => {
       const f = feat as GeoFeature;
-      if (selectedIso && f.properties.ISO_A2 === selectedIso)
-        return HIGHLIGHT_SIDE;
+      if (activeIso && f.properties.ISO_A2 === activeIso) return HIGHLIGHT_SIDE;
       return COUNTRY_SIDE;
     },
-    [selectedIso],
+    [activeIso],
   );
 
   const getPolygonAltitude = useCallback(
     (feat: object) => {
       const f = feat as GeoFeature;
-      if (selectedIso && f.properties.ISO_A2 === selectedIso) return 0.025;
+      if (activeIso && f.properties.ISO_A2 === activeIso) return 0.025;
       return 0.005;
     },
-    [selectedIso],
+    [activeIso],
   );
 
   const getPolygonLabel = useCallback(
     (feat: object) => {
       const f = feat as GeoFeature;
       const name = f.properties.NAME || f.properties.ADMIN || "";
-      if (selectedIso && f.properties.ISO_A2 === selectedIso) {
+      if (activeIso && f.properties.ISO_A2 === activeIso) {
         return `<div style="background:rgba(30,30,46,0.95);color:#e4e4ed;padding:6px 12px;border-radius:8px;font-size:13px;border:1px solid rgba(124,92,252,0.4)"><strong>${name}</strong></div>`;
       }
       return `<div style="background:rgba(30,30,46,0.9);color:#9494a8;padding:4px 10px;border-radius:6px;font-size:12px">${name}</div>`;
     },
-    [selectedIso],
+    [activeIso],
   );
 
   // Rings data for the pulsing effect on selected country
@@ -186,10 +227,10 @@ export default function GlobeView({
 
   return (
     <div ref={containerRef} className={styles.container}>
-      {selectedCountry && (
+      {(selectedCountry || clickedIso) && (
         <div className={styles.countryBadge}>
           <span className={styles.badgeDot} />
-          {selectedCountry.name}
+          {selectedCountry ? selectedCountry.name : clickedName}
         </div>
       )}
       {dimensions.width > 0 && (
@@ -216,6 +257,7 @@ export default function GlobeView({
           polygonsTransitionDuration={400}
           onPolygonHover={setHoveredCountry}
           onPolygonClick={handlePolygonClick}
+          onGlobeClick={handleGlobeClick}
           // Rings (pulse effect)
           ringsData={ringsData}
           ringColor={() => RING_COLOR}
@@ -225,9 +267,9 @@ export default function GlobeView({
           ringAltitude={0.03}
         />
       )}
-      {!selectedCountry && countries.length > 0 && (
+      {!selectedCountry && !clickedIso && countries.length > 0 && (
         <div className={styles.hint}>Click a job to see its country</div>
       )}
     </div>
   );
-}
+});
