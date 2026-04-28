@@ -140,4 +140,44 @@ public class GeminiAnalyzerService : IAiAnalyzerService
 
         throw new InvalidOperationException("Resposta do Gemini não contém JSON válido.");
     }
+
+    public async Task<string> ExtractJobDescriptionAsync(string rawPageText)
+    {
+        var systemPrompt = """
+            You are a job description extractor. You receive raw text extracted from a web page.
+            Your task is to identify and return ONLY the job description content, removing:
+            - Navigation menus, headers, footers
+            - Cookie banners, ads, sidebar content
+            - Login prompts, "apply now" buttons text
+            - Duplicate or repeated content
+            
+            Keep the actual job posting content: title, company, location, requirements, 
+            responsibilities, qualifications, benefits, salary info, etc.
+            
+            Return the cleaned job description as plain text. Do NOT wrap in JSON or markdown.
+            If you cannot find a job description in the text, respond with exactly: NO_JOB_FOUND
+            """;
+
+        var userPrompt = $"""
+            Extract the job description from this web page text:
+            
+            {rawPageText}
+            """;
+
+        var messages = new List<ChatMessage>
+        {
+            new SystemChatMessage(systemPrompt),
+            new UserChatMessage(userPrompt)
+        };
+
+        var completion = await _chatClient.CompleteChatAsync(messages);
+        var responseText = completion.Value.Content[0].Text?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(responseText) || responseText.Contains("NO_JOB_FOUND", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException(
+                "Não foi possível identificar uma descrição de vaga na página. " +
+                "Tente colar o texto da vaga diretamente.");
+
+        return responseText;
+    }
 }

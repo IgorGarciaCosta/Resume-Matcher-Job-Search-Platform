@@ -88,4 +88,10 @@ public class MockAiAnalyzerService : IAiAnalyzerService
         return $"[MOCK] Considere adicionar experiência ou menções a: {string.Join(", ", missingKeywords)}. " +
                "Destaque projetos onde você utilizou essas tecnologias, mesmo que em contextos pessoais ou de estudo.";
     }
+
+    public Task<string> ExtractJobDescriptionAsync(string rawPageText)
+    {
+        // Mock: retorna o texto bruto sem processamento de IA
+        return Task.FromResult(rawPageText);
+    }
 }

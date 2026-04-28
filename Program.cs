@@ -69,8 +69,15 @@ builder.Services.AddAuthentication(options =>
 // ── Dependency Injection ──────────────────────────────────────────────────────
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPdfExtractorService, PdfExtractorService>();
-builder.Services.AddScoped<IJobScraperService, JobScraperService>();
 builder.Services.AddScoped<IAiAnalyzerService, GeminiAnalyzerService>();
+builder.Services.AddHttpClient("JobScraper", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(15);
+    client.DefaultRequestHeaders.UserAgent.ParseAdd(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36");
+    client.DefaultRequestHeaders.Accept.ParseAdd("text/html,application/xhtml+xml");
+});
+builder.Services.AddScoped<IJobScraperService, JobScraperService>();
 builder.Services.AddScoped<MatcherService>();
 
 // ── Job Search Providers ──────────────────────────────────────────────────────
