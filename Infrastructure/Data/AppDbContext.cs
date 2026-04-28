@@ -11,6 +11,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Resume> Resumes => Set<Resume>();
     public DbSet<JobDescription> JobDescriptions => Set<JobDescription>();
     public DbSet<JobApplication> JobApplications => Set<JobApplication>();
+    public DbSet<SavedAnalysis> SavedAnalyses => Set<SavedAnalysis>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,6 +42,20 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             entity.HasOne(e => e.JobDescription)
                   .WithMany()
                   .HasForeignKey(e => e.JobDescriptionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<SavedAnalysis>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.ResumeFileName).HasMaxLength(256).IsRequired();
+            entity.Property(e => e.JobSource).HasMaxLength(2048).IsRequired();
+            entity.Property(e => e.MatchingKeywordsJson).IsRequired();
+            entity.Property(e => e.MissingKeywordsJson).IsRequired();
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }

@@ -409,3 +409,82 @@
   line-height: 1.6;
   white-space: pre-wrap;
 }
+
+/* ---------- Header row with saved-analyses link ---------- */
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.savedLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.savedLink:hover {
+  background: var(--accent-muted);
+  border-color: var(--accent);
+}
+
+/* ---------- Save analysis button ---------- */
+
+.saveRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.saveButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 24px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.savedButton {
+  background: var(--success);
+}
+
+.savedButton:hover:not(:disabled) {
+  background: var(--success);
+}
+
+.loginHint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.loginHint a {
+  color: var(--accent);
+  text-decoration: underline;
+}

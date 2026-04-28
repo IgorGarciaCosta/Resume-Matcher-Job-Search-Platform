@@ -87,7 +87,6 @@ export default function Layout() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.25 }}
-            style={{ display: "contents" }}
           >
             <Outlet />
           </motion.div>

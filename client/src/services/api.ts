@@ -158,3 +158,58 @@ export async function analyzeResume(data: {
   }
   return res.json();
 }
+
+// ── Saved Analyses Types ──────────────────────────────────────────────────────
+
+export interface SavedAnalysis {
+  id: string;
+  resumeFileName: string;
+  jobSource: string;
+  score: number;
+  matchingKeywords: string[];
+  missingKeywords: string[];
+  improvementSuggestions: string;
+  analyzedAt: string;
+}
+
+// ── Saved Analyses API ────────────────────────────────────────────────────────
+
+/** Saves a completed analysis for the authenticated user. */
+export async function saveAnalysis(data: {
+  resumeFileName: string;
+  jobSource: string;
+  score: number;
+  matchingKeywords: string[];
+  missingKeywords: string[];
+  improvementSuggestions: string;
+}): Promise<SavedAnalysis> {
+  const res = await fetch(`${API_BASE}/analysis`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Failed to save analysis");
+  }
+  return res.json();
+}
+
+/** Returns all saved analyses for the authenticated user, newest first. */
+export async function getSavedAnalyses(): Promise<SavedAnalysis[]> {
+  const res = await fetch(`${API_BASE}/analysis`, {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to fetch saved analyses");
+  return res.json();
+}
+
+/** Deletes a saved analysis by ID. */
+export async function deleteSavedAnalysis(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/analysis/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to delete analysis");
+}

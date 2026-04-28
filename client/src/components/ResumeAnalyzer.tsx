@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
   FileText,
   Upload,
@@ -6,12 +7,17 @@ import {
   Loader2,
   Lightbulb,
   AlertCircle,
+  Save,
+  Check,
+  BookmarkCheck,
 } from "lucide-react";
 import {
   analyzeResume,
+  saveAnalysis,
   AiServiceError,
   type MatchResult,
 } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 import { useScoreAnimation } from "./hooks/useScoreAnimation";
 import ScoreRing from "./ScoreRing";
 import AiErrorCard from "./AiErrorCard";
@@ -29,7 +35,10 @@ export default function ResumeAnalyzer() {
   const [result, setResult] = useState<MatchResult | null>(null);
   const [error, setError] = useState("");
   const [isAiError, setIsAiError] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const { isAuthenticated } = useAuth();
 
   const { animPhase, displayScore, ringOffset, resetAnim } = useScoreAnimation(
     result?.score ?? null,
@@ -54,6 +63,8 @@ export default function ResumeAnalyzer() {
     setError("");
     setIsAiError(false);
     setResult(null);
+    setSaving(false);
+    setSaved(false);
     resetAnim();
     try {
       const res = await analyzeResume({
@@ -82,11 +93,41 @@ export default function ResumeAnalyzer() {
         ? "var(--warning)"
         : "var(--danger)";
 
+  const handleSave = async () => {
+    if (!result || !file) return;
+    setSaving(true);
+    try {
+      await saveAnalysis({
+        resumeFileName: file.name,
+        jobSource:
+          inputMode === "url" ? jobUrl : jobText.slice(0, 200),
+        score: result.score,
+        matchingKeywords: result.matchingKeywords,
+        missingKeywords: result.missingKeywords,
+        improvementSuggestions: result.improvementSuggestions,
+      });
+      setSaved(true);
+    } catch {
+      setError("Failed to save analysis");
+      setIsAiError(false);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <section className={styles.section}>
-      <div className={styles.header}>
-        <FileText size={22} className={styles.headerIcon} />
-        <h2>Resume Analyzer</h2>
+      <div className={styles.headerRow}>
+        <div className={styles.header}>
+          <FileText size={22} className={styles.headerIcon} />
+          <h2>Resume Analyzer</h2>
+        </div>
+        {isAuthenticated && (
+          <Link to="/saved-analyses" className={styles.savedLink}>
+            <BookmarkCheck size={16} />
+            Saved Analyses
+          </Link>
+        )}
       </div>
       <p className={styles.subtitle}>
         Match your resume against a job description using AI
@@ -199,6 +240,36 @@ export default function ResumeAnalyzer() {
                 Improvement Suggestions
               </h4>
               <p>{result.improvementSuggestions}</p>
+            </div>
+          )}
+
+          {animPhase >= 3 && (
+            <div className={`${styles.saveRow} ${styles.fadeIn}`}>
+              {isAuthenticated ? (
+                <button
+                  className={`${styles.saveButton} ${saved ? styles.savedButton : ""}`}
+                  onClick={handleSave}
+                  disabled={saving || saved}
+                >
+                  {saved ? (
+                    <>
+                      <Check size={16} /> Saved
+                    </>
+                  ) : saving ? (
+                    <>
+                      <Loader2 size={16} className={styles.spin} /> Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={16} /> Save Analysis
+                    </>
+                  )}
+                </button>
+              ) : (
+                <p className={styles.loginHint}>
+                  <Link to="/login">Log in</Link> to save this analysis
+                </p>
+              )}
             </div>
           )}
         </div>
