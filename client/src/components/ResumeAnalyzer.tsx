@@ -29,6 +29,7 @@ import styles from "./ResumeAnalyzer.module.css";
 
 export default function ResumeAnalyzer() {
   const [file, setFile] = useState<File | null>(null);
+  const [dragging, setDragging] = useState(false);
   const [jobUrl, setJobUrl] = useState("");
   const [jobText, setJobText] = useState("");
   const [inputMode, setInputMode] = useState<"url" | "text">("url");
@@ -41,6 +42,25 @@ export default function ResumeAnalyzer() {
   const fileRef = useRef<HTMLInputElement>(null);
   const { isAuthenticated } = useAuth();
   const loadingMessage = useRotatingMessage(loading);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const dropped = e.dataTransfer.files[0];
+    if (dropped?.type === "application/pdf") {
+      setFile(dropped);
+    }
+  };
 
   const { animPhase, displayScore, ringOffset, resetAnim } = useScoreAnimation(
     result?.score ?? null,
@@ -136,8 +156,11 @@ export default function ResumeAnalyzer() {
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div
-          className={styles.dropzone}
+          className={`${styles.dropzone} ${dragging ? styles.dropzoneActive : ""}`}
           onClick={() => fileRef.current?.click()}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
           <input
             ref={fileRef}
@@ -150,7 +173,11 @@ export default function ResumeAnalyzer() {
           {file ? (
             <span className={styles.fileName}>{file.name}</span>
           ) : (
-            <span>Click to upload resume (PDF)</span>
+            <span>
+              {dragging
+                ? "Drop your PDF here"
+                : "Click or drag & drop resume (PDF)"}
+            </span>
           )}
         </div>
 

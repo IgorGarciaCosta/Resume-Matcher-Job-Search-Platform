@@ -54,6 +54,12 @@
   background: var(--accent-muted);
 }
 
+.dropzoneActive {
+  border-color: var(--accent);
+  background: var(--accent-muted);
+  border-style: solid;
+}
+
 .uploadIcon {
   color: var(--text-muted);
 }
