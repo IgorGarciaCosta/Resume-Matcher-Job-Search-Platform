@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Search,
   MapPin,
@@ -8,6 +8,8 @@ import {
   SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
+  X,
+  Globe,
 } from "lucide-react";
 import { searchJobs, type JobSearchResult } from "../services/api";
 import { resolveCountry, type CountryCoord } from "../data/countryCoordinates";
@@ -33,6 +35,13 @@ export default function JobSearch() {
     null,
   );
   const [selectedJobIndex, setSelectedJobIndex] = useState<number | null>(null);
+  const [globeFilterIso, setGlobeFilterIso] = useState<string | null>(null);
+  const [globeFilterName, setGlobeFilterName] = useState("");
+  const [toast, setToast] = useState<string | null>(null);
+  const [toastKey, setToastKey] = useState(0);
+  const toastTimer = useRef<ReturnType<typeof setTimeout>>(null);
+  const jobsRef = useRef(jobs);
+  jobsRef.current = jobs;
   const filtersRef = useRef<HTMLDivElement>(null);
 
   const handleJobSelect = (job: JobSearchResult, index: number) => {
@@ -41,9 +50,48 @@ export default function JobSearch() {
     setSelectedJobIndex(index);
   };
 
+  const showToast = useCallback((msg: string) => {
+    setToast(msg);
+    setToastKey((k) => k + 1);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 3000);
+  }, []);
+
+  const handleGlobeCountryClick = useCallback(
+    (iso: string, name: string) => {
+      const matching = jobsRef.current.filter(
+        (job) => resolveCountry(job.location)?.iso === iso,
+      );
+      if (matching.length === 0) {
+        showToast(`No jobs found in ${name}`);
+        setGlobeFilterIso(null);
+        setGlobeFilterName("");
+        return;
+      } else {
+        setGlobeFilterIso(iso);
+        setGlobeFilterName(name);
+        setCurrentPage(1);
+        setSelectedJobIndex(null);
+      }
+    },
+    [showToast],
+  );
+
+  const clearGlobeFilter = () => {
+    setGlobeFilterIso(null);
+    setGlobeFilterName("");
+    setCurrentPage(1);
+    setSelectedJobIndex(null);
+  };
+
   const JOBS_PER_PAGE = 5;
-  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
-  const paginatedJobs = jobs.slice(
+
+  const filteredJobs = globeFilterIso
+    ? jobs.filter((job) => resolveCountry(job.location)?.iso === globeFilterIso)
+    : jobs;
+
+  const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
+  const paginatedJobs = filteredJobs.slice(
     (currentPage - 1) * JOBS_PER_PAGE,
     currentPage * JOBS_PER_PAGE,
   );
@@ -165,13 +213,25 @@ export default function JobSearch() {
 
         {searched && !loading && !error && (
           <div className={styles.meta}>
-            <span>{totalCount} results found</span>
-            {sources.length > 0 && (
+            <span>
+              {globeFilterIso
+                ? `${filteredJobs.length} of ${totalCount} results in ${globeFilterName}`
+                : `${totalCount} results found`}
+            </span>
+            {sources.length > 0 && !globeFilterIso && (
               <span className={styles.sources}>
                 Sources: {sources.join(", ")}
               </span>
             )}
           </div>
+        )}
+
+        {globeFilterIso && (
+          <button className={styles.filterBadge} onClick={clearGlobeFilter}>
+            <Globe size={13} />
+            {globeFilterName}
+            <X size={13} />
+          </button>
         )}
 
         {loading && (
@@ -220,8 +280,17 @@ export default function JobSearch() {
       </section>
 
       <aside className={styles.globePanel}>
-        <GlobeView selectedCountry={selectedCountry} />
+        <GlobeView
+          selectedCountry={selectedCountry}
+          onCountryClick={handleGlobeCountryClick}
+        />
       </aside>
+
+      {toast && (
+        <div key={toastKey} className={styles.toast}>
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

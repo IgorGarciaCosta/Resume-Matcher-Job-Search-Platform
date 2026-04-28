@@ -20,6 +20,7 @@ interface GeoFeature {
 
 interface GlobeViewProps {
   selectedCountry: CountryCoord | null;
+  onCountryClick?: (iso: string, name: string) => void;
 }
 
 const GEOJSON_URL =
@@ -41,7 +42,10 @@ const globeMaterial = new MeshPhongMaterial({
   opacity: 0.95,
 });
 
-export default function GlobeView({ selectedCountry }: GlobeViewProps) {
+export default function GlobeView({
+  selectedCountry,
+  onCountryClick,
+}: GlobeViewProps) {
   const globeRef = useRef<unknown>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [countries, setCountries] = useState<GeoFeature[]>([]);
@@ -93,6 +97,18 @@ export default function GlobeView({ selectedCountry }: GlobeViewProps) {
       1200,
     );
   }, [selectedCountry]);
+
+  const handlePolygonClick = useCallback(
+    (feat: object) => {
+      const f = feat as GeoFeature;
+      const iso = f.properties.ISO_A2;
+      const name = f.properties.NAME || f.properties.ADMIN || "";
+      if (iso && iso !== "-99" && onCountryClick) {
+        onCountryClick(iso, name);
+      }
+    },
+    [onCountryClick],
+  );
 
   const getPolygonCapColor = useCallback(
     (feat: object) => {
@@ -199,6 +215,7 @@ export default function GlobeView({ selectedCountry }: GlobeViewProps) {
           polygonLabel={getPolygonLabel}
           polygonsTransitionDuration={400}
           onPolygonHover={setHoveredCountry}
+          onPolygonClick={handlePolygonClick}
           // Rings (pulse effect)
           ringsData={ringsData}
           ringColor={() => RING_COLOR}

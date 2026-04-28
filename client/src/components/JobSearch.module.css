@@ -276,3 +276,60 @@
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
+
+.filterBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  margin-bottom: 12px;
+  background: var(--accent-muted);
+  border: 1px solid rgba(124, 92, 252, 0.3);
+  border-radius: 20px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.filterBadge:hover {
+  background: rgba(124, 92, 252, 0.25);
+  border-color: var(--accent);
+}
+
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 24px;
+  background: rgba(30, 30, 46, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  z-index: 100;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  animation: toastFade 3s ease-in-out forwards;
+}
+
+@keyframes toastFade {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
