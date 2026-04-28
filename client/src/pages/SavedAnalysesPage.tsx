@@ -130,8 +130,8 @@ export default function SavedAnalysesPage() {
           <Inbox size={40} className={styles.emptyIcon} />
           <p>No saved analyses yet.</p>
           <p>
-            Run an analysis in the{" "}
-            <Link to="/analyzer">Resume Analyzer</Link> and save the results!
+            Run an analysis in the <Link to="/analyzer">Resume Analyzer</Link>{" "}
+            and save the results!
           </p>
         </div>
       )}
@@ -192,7 +192,9 @@ export default function SavedAnalysesPage() {
 
               {confirmDeleteId === a.id && (
                 <div className={styles.confirmOverlay}>
-                  <span className={styles.confirmText}>Delete this analysis?</span>
+                  <span className={styles.confirmText}>
+                    Delete this analysis?
+                  </span>
                   <button
                     className={`${styles.confirmBtn} ${styles.confirmYes}`}
                     onClick={() => handleDelete(a.id)}

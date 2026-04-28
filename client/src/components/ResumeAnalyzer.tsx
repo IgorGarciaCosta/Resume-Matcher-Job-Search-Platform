@@ -19,6 +19,7 @@ import {
 } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useScoreAnimation } from "./hooks/useScoreAnimation";
+import { useRotatingMessage } from "./hooks/useRotatingMessage";
 import ScoreRing from "./ScoreRing";
 import AiErrorCard from "./AiErrorCard";
 import KeywordsList from "./KeywordsList";
@@ -39,6 +40,7 @@ export default function ResumeAnalyzer() {
   const [saved, setSaved] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const { isAuthenticated } = useAuth();
+  const loadingMessage = useRotatingMessage(loading);
 
   const { animPhase, displayScore, ringOffset, resetAnim } = useScoreAnimation(
     result?.score ?? null,
@@ -99,8 +101,7 @@ export default function ResumeAnalyzer() {
     try {
       await saveAnalysis({
         resumeFileName: file.name,
-        jobSource:
-          inputMode === "url" ? jobUrl : jobText.slice(0, 200),
+        jobSource: inputMode === "url" ? jobUrl : jobText.slice(0, 200),
         score: result.score,
         matchingKeywords: result.matchingKeywords,
         missingKeywords: result.missingKeywords,
@@ -212,7 +213,7 @@ export default function ResumeAnalyzer() {
       {error && isAiError && <AiErrorCard />}
 
       {loading && (
-        <LoadingAnimation message="Analyzing your resume with AI">
+        <LoadingAnimation message={loadingMessage}>
           <AnalyzingCharacter />
         </LoadingAnimation>
       )}
