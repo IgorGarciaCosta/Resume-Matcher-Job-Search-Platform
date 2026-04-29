@@ -1,12 +1,12 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using ResumeMatcher.Api.Application.DTOs;
 using ResumeMatcher.Api.Application.Interfaces;
+using ResumeMatcher.Api.Infrastructure.Helpers;
 
 namespace ResumeMatcher.Api.Infrastructure.Services;
 
-public partial class JobicyJobSearchProvider : IJobSearchProvider
+public class JobicyJobSearchProvider : IJobSearchProvider
 {
     private readonly HttpClient _httpClient;
 
@@ -36,14 +36,14 @@ public partial class JobicyJobSearchProvider : IJobSearchProvider
 
         var jobs = response.Jobs.Select(j =>
         {
-            var salary = FormatSalary(j.SalaryMin, j.SalaryMax, j.SalaryCurrency, j.SalaryPeriod);
+            var salary = SalaryFormatter.FormatSalary(j.SalaryMin, j.SalaryMax, j.SalaryCurrency, j.SalaryPeriod);
 
             return new JobSearchResultDto
             {
                 Title = j.JobTitle ?? string.Empty,
                 Company = j.CompanyName ?? string.Empty,
                 Location = j.JobGeo ?? "Remote",
-                Description = StripHtml(j.JobDescription ?? j.JobExcerpt ?? string.Empty),
+                Description = HtmlHelper.StripHtml(j.JobDescription ?? j.JobExcerpt ?? string.Empty),
                 Url = j.Url ?? string.Empty,
                 Salary = salary,
                 PostedAt = DateTime.TryParse(j.PubDate, out var dt) ? dt : null,
@@ -62,32 +62,6 @@ public partial class JobicyJobSearchProvider : IJobSearchProvider
             Sources = [ProviderName]
         };
     }
-
-    private static string? FormatSalary(int? min, int? max, string? currency, string? period)
-    {
-        if (min is null && max is null) return null;
-        var cur = currency ?? "USD";
-        var per = period ?? "yearly";
-        if (min is not null && max is not null)
-            return $"{cur} {min:N0}-{max:N0}/{per}";
-        if (min is not null)
-            return $"{cur} {min:N0}+/{per}";
-        return $"{cur} up to {max:N0}/{per}";
-    }
-
-    private static string StripHtml(string html)
-    {
-        if (string.IsNullOrEmpty(html)) return html;
-        var text = HtmlTagRegex().Replace(html, " ");
-        text = System.Net.WebUtility.HtmlDecode(text);
-        return WhitespaceRegex().Replace(text, " ").Trim();
-    }
-
-    [GeneratedRegex("<[^>]+>")]
-    private static partial Regex HtmlTagRegex();
-
-    [GeneratedRegex(@"\s{2,}")]
-    private static partial Regex WhitespaceRegex();
 
     // --- Jobicy API response models ---
 

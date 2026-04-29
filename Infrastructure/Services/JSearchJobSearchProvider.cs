@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using ResumeMatcher.Api.Application.DTOs;
 using ResumeMatcher.Api.Application.Interfaces;
+using ResumeMatcher.Api.Infrastructure.Helpers;
 
 namespace ResumeMatcher.Api.Infrastructure.Services;
 
@@ -56,7 +57,7 @@ public class JSearchJobSearchProvider : IJobSearchProvider
             Location = j.JobLocation ?? (j.JobIsRemote == true ? "Remote" : string.Empty),
             Description = j.JobDescription ?? string.Empty,
             Url = j.JobApplyLink ?? j.JobGoogleLink ?? string.Empty,
-            Salary = FormatSalary(j.JobMinSalary, j.JobMaxSalary, j.JobSalaryPeriod),
+            Salary = SalaryFormatter.FormatSalary(j.JobMinSalary, j.JobMaxSalary, period: j.JobSalaryPeriod),
             PostedAt = j.JobPostedAtTimestamp is not null
                 ? DateTimeOffset.FromUnixTimeSeconds(j.JobPostedAtTimestamp.Value).UtcDateTime
                 : null,
@@ -73,23 +74,6 @@ public class JSearchJobSearchProvider : IJobSearchProvider
             PageSize = pageSize,
             Sources = [ProviderName]
         };
-    }
-
-    private static string? FormatSalary(double? min, double? max, string? period)
-    {
-        if (min is null && max is null) return null;
-        var per = period?.ToLowerInvariant() switch
-        {
-            "year" => "/year",
-            "month" => "/month",
-            "hour" => "/hour",
-            _ => ""
-        };
-        if (min is not null && max is not null)
-            return $"${min:N0}-${max:N0}{per}";
-        if (min is not null)
-            return $"${min:N0}+{per}";
-        return $"up to ${max:N0}{per}";
     }
 
     // --- JSearch API response models ---

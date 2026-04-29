@@ -105,11 +105,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // ── CORS (para frontend React no Vite) ────────────────────────────────────────
+var corsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                  ?? ["http://localhost:5173"];
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000")
+        policy.WithOrigins(corsOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

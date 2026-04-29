@@ -1,0 +1,22 @@
+[
+  "c#", "csharp", ".net", "asp.net", "javascript", "typescript", "react",
+  "angular", "vue", "node.js", "python", "java", "sql", "nosql", "mongodb",
+  "postgresql", "docker", "kubernetes", "aws", "azure", "gcp", "ci/cd",
+  "git", "rest", "api", "microservices", "agile", "scrum", "tdd", "solid",
+  "clean architecture", "entity framework", "ef core", "blazor", "redis",
+  "rabbitmq", "kafka", "graphql", "html", "css", "tailwind", "sass",
+  "webpack", "vite", "linux", "devops", "terraform", "jenkins",
+  "github actions", "azure devops", "jira", "confluence", "figma",
+  "machine learning", "ai", "openai", "llm", "data engineering",
+  "etl", "spark", "databricks", "power bi", "tableau",
+  "communication", "leadership", "teamwork", "problem-solving",
+  "senior", "lead", "architect", "full-stack", "backend", "frontend",
+  "web scraping", "selenium", "playwright", "xunit", "nunit", "jest",
+  "testing", "unit test", "integration test", "swagger", "openapi",
+  "oauth", "jwt", "authentication", "authorization", "security",
+  "performance", "scalability", "design patterns", "ddd",
+  "domain-driven design", "cqrs", "event sourcing", "signalr",
+  "grpc", "wcf", "wpf", "maui", "xamarin", "flutter", "dart",
+  "go", "golang", "rust", "ruby", "rails", "django", "flask",
+  "spring", "spring boot", "hibernate", "maven", "gradle"
+]

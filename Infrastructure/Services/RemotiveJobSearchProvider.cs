@@ -1,12 +1,12 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using ResumeMatcher.Api.Application.DTOs;
 using ResumeMatcher.Api.Application.Interfaces;
+using ResumeMatcher.Api.Infrastructure.Helpers;
 
 namespace ResumeMatcher.Api.Infrastructure.Services;
 
-public partial class RemotiveJobSearchProvider : IJobSearchProvider
+public class RemotiveJobSearchProvider : IJobSearchProvider
 {
     private readonly HttpClient _httpClient;
 
@@ -36,7 +36,7 @@ public partial class RemotiveJobSearchProvider : IJobSearchProvider
             Title = j.Title ?? string.Empty,
             Company = j.CompanyName ?? string.Empty,
             Location = j.CandidateRequiredLocation ?? "Remote",
-            Description = StripHtml(j.Description ?? string.Empty),
+            Description = HtmlHelper.StripHtml(j.Description ?? string.Empty),
             Url = j.Url ?? string.Empty,
             Salary = j.Salary,
             PostedAt = DateTime.TryParse(j.PublicationDate, out var dt) ? dt : null,
@@ -64,20 +64,6 @@ public partial class RemotiveJobSearchProvider : IJobSearchProvider
             Sources = [ProviderName]
         };
     }
-
-    private static string StripHtml(string html)
-    {
-        if (string.IsNullOrEmpty(html)) return html;
-        var text = HtmlTagRegex().Replace(html, " ");
-        text = System.Net.WebUtility.HtmlDecode(text);
-        return WhitespaceRegex().Replace(text, " ").Trim();
-    }
-
-    [GeneratedRegex("<[^>]+>")]
-    private static partial Regex HtmlTagRegex();
-
-    [GeneratedRegex(@"\s{2,}")]
-    private static partial Regex WhitespaceRegex();
 
     // --- Remotive API response models ---
 

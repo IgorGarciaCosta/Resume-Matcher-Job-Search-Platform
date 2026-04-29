@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ResumeMatcher.Api.Application.DTOs;
 using ResumeMatcher.Api.Application.Interfaces;
 
@@ -9,6 +10,15 @@ namespace ResumeMatcher.Api.Infrastructure.Services;
 /// </summary>
 public class MockAiAnalyzerService : IAiAnalyzerService
 {
+    private static readonly Lazy<HashSet<string>> TechTerms = new(() =>
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, "Infrastructure", "Data", "tech-terms.json");
+        if (!File.Exists(path))
+            return new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var json = File.ReadAllText(path);
+        var terms = JsonSerializer.Deserialize<List<string>>(json) ?? [];
+        return new HashSet<string>(terms, StringComparer.OrdinalIgnoreCase);
+    });
     public Task<MatchResultDto> AnalyzeMatchAsync(string resumeText, string jobText)
     {
         // Extrai palavras do texto da vaga (simplificado)
@@ -36,30 +46,7 @@ public class MockAiAnalyzerService : IAiAnalyzerService
 
     private static List<string> ExtractKeywords(string text)
     {
-        // Lista de tech keywords comuns para filtrar do texto
-        var techTerms = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "c#", "csharp", ".net", "asp.net", "javascript", "typescript", "react",
-            "angular", "vue", "node.js", "python", "java", "sql", "nosql", "mongodb",
-            "postgresql", "docker", "kubernetes", "aws", "azure", "gcp", "ci/cd",
-            "git", "rest", "api", "microservices", "agile", "scrum", "tdd", "solid",
-            "clean architecture", "entity framework", "ef core", "blazor", "redis",
-            "rabbitmq", "kafka", "graphql", "html", "css", "tailwind", "sass",
-            "webpack", "vite", "linux", "devops", "terraform", "jenkins",
-            "github actions", "azure devops", "jira", "confluence", "figma",
-            "machine learning", "ai", "openai", "llm", "data engineering",
-            "etl", "spark", "databricks", "power bi", "tableau",
-            "communication", "leadership", "teamwork", "problem-solving",
-            "senior", "lead", "architect", "full-stack", "backend", "frontend",
-            "web scraping", "selenium", "playwright", "xunit", "nunit", "jest",
-            "testing", "unit test", "integration test", "swagger", "openapi",
-            "oauth", "jwt", "authentication", "authorization", "security",
-            "performance", "scalability", "design patterns", "ddd",
-            "domain-driven design", "cqrs", "event sourcing", "signalr",
-            "grpc", "wcf", "wpf", "maui", "xamarin", "flutter", "dart",
-            "go", "golang", "rust", "ruby", "rails", "django", "flask",
-            "spring", "spring boot", "hibernate", "maven", "gradle"
-        };
+        var techTerms = TechTerms.Value;
 
         // Normaliza o texto e procura matches
         var words = text.ToLowerInvariant()

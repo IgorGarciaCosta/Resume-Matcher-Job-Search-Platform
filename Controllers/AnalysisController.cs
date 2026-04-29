@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -49,8 +48,8 @@ public class AnalysisController : ControllerBase
                 ? request.JobSource[..2048]
                 : request.JobSource,
             Score = request.Score,
-            MatchingKeywordsJson = JsonSerializer.Serialize(request.MatchingKeywords),
-            MissingKeywordsJson = JsonSerializer.Serialize(request.MissingKeywords),
+            MatchingKeywords = request.MatchingKeywords,
+            MissingKeywords = request.MissingKeywords,
             ImprovementSuggestions = request.ImprovementSuggestions,
             AnalyzedAt = DateTime.UtcNow,
         };
@@ -120,8 +119,8 @@ public class AnalysisController : ControllerBase
         ResumeFileName = entity.ResumeFileName,
         JobSource = entity.JobSource,
         Score = entity.Score,
-        MatchingKeywords = JsonSerializer.Deserialize<List<string>>(entity.MatchingKeywordsJson) ?? [],
-        MissingKeywords = JsonSerializer.Deserialize<List<string>>(entity.MissingKeywordsJson) ?? [],
+        MatchingKeywords = entity.MatchingKeywords,
+        MissingKeywords = entity.MissingKeywords,
         ImprovementSuggestions = entity.ImprovementSuggestions,
         AnalyzedAt = entity.AnalyzedAt,
     };

@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using ResumeMatcher.Api.Application.DTOs;
 using ResumeMatcher.Api.Application.Interfaces;
+using ResumeMatcher.Api.Infrastructure.Helpers;
 
 namespace ResumeMatcher.Api.Infrastructure.Services;
 
@@ -54,7 +55,7 @@ public class AdzunaJobSearchProvider : IJobSearchProvider
             Location = j.Location?.DisplayName ?? string.Empty,
             Description = j.Description ?? string.Empty,
             Url = j.RedirectUrl ?? string.Empty,
-            Salary = FormatSalary(j.SalaryMin, j.SalaryMax),
+            Salary = SalaryFormatter.FormatSalary(j.SalaryMin, j.SalaryMax),
             PostedAt = DateTime.TryParse(j.Created, out var dt) ? dt : null,
             Source = ProviderName,
             Tags = j.Category?.Tag is not null ? [j.Category.Tag] : [],
@@ -69,20 +70,6 @@ public class AdzunaJobSearchProvider : IJobSearchProvider
             PageSize = pageSize,
             Sources = [ProviderName]
         };
-    }
-
-    private static string? FormatSalary(double? min, double? max)
-    {
-        if (min is null && max is null) return null;
-        if (min is not null && max is not null)
-        {
-            if (Math.Abs(min.Value - max.Value) < 1)
-                return $"${min:N0}/year";
-            return $"${min:N0}-${max:N0}/year";
-        }
-        if (min is not null)
-            return $"${min:N0}+/year";
-        return $"up to ${max:N0}/year";
     }
 
     // --- Adzuna API response models ---

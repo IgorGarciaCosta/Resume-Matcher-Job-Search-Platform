@@ -20,15 +20,18 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly string _clientBaseUrl;
 
     public AuthController(
         IAuthService authService,
         UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager)
+        SignInManager<ApplicationUser> signInManager,
+        IConfiguration configuration)
     {
         _authService = authService;
         _userManager = userManager;
         _signInManager = signInManager;
+        _clientBaseUrl = configuration["ClientApp:BaseUrl"] ?? "http://localhost:5173";
     }
 
     /// <summary>Registers a new user, generates a JWT, and sets it as an HttpOnly cookie.</summary>
@@ -106,7 +109,7 @@ public class AuthController : ControllerBase
     {
         var info = await _signInManager.GetExternalLoginInfoAsync();
         if (info is null)
-            return Redirect("http://localhost:5173/login?error=external_login_failed");
+            return Redirect($"{_clientBaseUrl}/login?error=external_login_failed");
 
         // Try to sign in with the external login
         var signInResult = await _signInManager.ExternalLoginSignInAsync(
@@ -125,7 +128,7 @@ public class AuthController : ControllerBase
             var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? "User";
 
             if (email is null)
-                return Redirect("http://localhost:5173/login?error=no_email");
+                return Redirect($"{_clientBaseUrl}/login?error=no_email");
 
             user = await _userManager.FindByEmailAsync(email);
             if (user is null)
@@ -139,19 +142,19 @@ public class AuthController : ControllerBase
                 };
                 var createResult = await _userManager.CreateAsync(user);
                 if (!createResult.Succeeded)
-                    return Redirect("http://localhost:5173/login?error=creation_failed");
+                    return Redirect($"{_clientBaseUrl}/login?error=creation_failed");
             }
 
             await _userManager.AddLoginAsync(user, info);
         }
 
         if (user is null)
-            return Redirect("http://localhost:5173/login?error=user_not_found");
+            return Redirect($"{_clientBaseUrl}/login?error=user_not_found");
 
         var token = _authService.GenerateJwtToken(user.Id, user.Email!, user.FullName);
         SetTokenCookie(token);
 
-        return Redirect("http://localhost:5173/auth/callback");
+        return Redirect($"{_clientBaseUrl}/auth/callback");
     }
 
     /// <summary>Appends a signed JWT as an HttpOnly, SameSite=Lax cookie with 24h expiration.</summary>
