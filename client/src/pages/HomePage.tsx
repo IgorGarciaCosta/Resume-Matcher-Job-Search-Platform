@@ -28,18 +28,18 @@ const containerVariants = {
   hidden: {},
   show: {
     transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.6,
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
     },
   },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as const },
+    transition: { duration: 0.4, ease: "easeOut" as const },
   },
 };
 
@@ -47,19 +47,14 @@ export default function HomePage() {
   return (
     <div className={styles.home}>
       {/* Welcome section */}
-      <motion.div
-        className={styles.welcome}
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
+      <div className={styles.welcome}>
         <h1 className={styles.title}>
           Welcome to <span className={styles.highlight}>Resume Matcher</span>
         </h1>
         <p className={styles.subtitle}>
           Your AI-powered companion for job searching and resume optimization.
         </p>
-      </motion.div>
+      </div>
 
       {/* Mode cards */}
       <motion.div

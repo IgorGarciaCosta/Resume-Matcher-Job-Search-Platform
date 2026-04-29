@@ -1,4 +1,5 @@
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation, useOutlet } from "react-router-dom";
 import {
   Sparkles,
   Code,
@@ -12,6 +13,17 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import "../App.css";
+
+/**
+ * Captures the outlet content at mount time so it stays frozen
+ * during AnimatePresence exit animations instead of switching
+ * to the new route's content immediately.
+ */
+function FrozenOutlet() {
+  const outlet = useOutlet();
+  const [frozen] = useState(outlet);
+  return frozen;
+}
 
 export default function Layout() {
   const location = useLocation();
@@ -75,7 +87,7 @@ export default function Layout() {
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.25 }}
           >
-            <Outlet />
+            <FrozenOutlet />
           </motion.div>
         </AnimatePresence>
       </main>
