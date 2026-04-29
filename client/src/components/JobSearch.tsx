@@ -293,6 +293,7 @@ export default function JobSearch() {
       <aside className={styles.globePanel}>
         <GlobeView
           selectedCountry={selectedCountry}
+          globeFilterIso={globeFilterIso}
           onCountryClick={handleGlobeCountryClick}
           onBackgroundClick={handleGlobeBackgroundClick}
         />

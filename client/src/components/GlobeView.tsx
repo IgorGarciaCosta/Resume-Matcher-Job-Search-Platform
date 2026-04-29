@@ -20,6 +20,7 @@ interface GeoFeature {
 
 interface GlobeViewProps {
   selectedCountry: CountryCoord | null;
+  globeFilterIso?: string | null;
   onCountryClick?: (iso: string, name: string) => void;
   onBackgroundClick?: () => void;
 }
@@ -45,6 +46,7 @@ const globeMaterial = new MeshPhongMaterial({
 
 export default memo(function GlobeView({
   selectedCountry,
+  globeFilterIso: externalFilterIso,
   onCountryClick,
   onBackgroundClick,
 }: GlobeViewProps) {
@@ -57,6 +59,14 @@ export default memo(function GlobeView({
   const [hoveredCountry, setHoveredCountry] = useState<GeoFeature | null>(null);
   const [clickedIso, setClickedIso] = useState<string | null>(null);
   const [clickedName, setClickedName] = useState("");
+
+  // Clear internal clicked state when parent removes the globe filter
+  useEffect(() => {
+    if (externalFilterIso === null) {
+      setClickedIso(null);
+      setClickedName("");
+    }
+  }, [externalFilterIso]);
 
   // Dynamically import react-globe.gl (heavy dep, code-split)
   useEffect(() => {
