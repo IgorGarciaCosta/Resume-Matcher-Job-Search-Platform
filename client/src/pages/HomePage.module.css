@@ -20,10 +20,14 @@
   font-weight: 800;
   line-height: 1.2;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .highlight {
-  color: var(--accent);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subtitle {
@@ -43,22 +47,42 @@
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
   padding: 36px 28px;
-  background: var(--bg-card);
+  background: linear-gradient(145deg, var(--bg-card) 0%, rgba(30, 30, 46, 0.6) 100%);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   text-decoration: none;
-  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(124, 92, 252, 0.3), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-base);
 }
 
 .card:hover {
   transform: translateY(-4px);
   border-color: var(--accent);
-  box-shadow: 0 8px 32px rgba(124, 92, 252, 0.15);
+  box-shadow: 0 8px 32px rgba(124, 92, 252, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover::before {
+  opacity: 1;
 }
 
 .iconWrapper {
@@ -68,6 +92,7 @@
   width: 56px;
   height: 56px;
   border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
 }
 
 .cardTitle {

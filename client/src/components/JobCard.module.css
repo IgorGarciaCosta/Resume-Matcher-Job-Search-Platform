@@ -1,14 +1,20 @@
 .card {
-  background: var(--bg-secondary);
+  background: linear-gradient(145deg, var(--bg-secondary) 0%, rgba(26, 26, 36, 0.7) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  transition: transform var(--transition-base), border-color var(--transition-base), background var(--transition-base), box-shadow var(--transition-base);
   cursor: pointer;
 }
 
 .card:hover {
+  transform: translateY(-2px);
   border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(124, 92, 252, 0.1), 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.card:active {
+  transform: translateY(0);
 }
 
 .cardSelected {

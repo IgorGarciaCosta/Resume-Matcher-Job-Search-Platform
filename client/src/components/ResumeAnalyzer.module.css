@@ -1,8 +1,9 @@
 .section {
-  background: var(--bg-card);
+  background: linear-gradient(145deg, var(--bg-card) 0%, rgba(30, 30, 46, 0.7) 100%);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 28px;
+  box-shadow: var(--shadow-sm);
 }
 
 .header {
@@ -40,24 +41,30 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 28px;
+  padding: 32px;
   border: 2px dashed var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   color: var(--text-secondary);
   font-size: 0.9rem;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color var(--transition-base), background var(--transition-base), box-shadow var(--transition-base);
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 .dropzone:hover {
   border-color: var(--accent);
-  background: var(--accent-muted);
+  background-color: var(--accent-muted);
+  background-image: none;
+  box-shadow: var(--focus-ring);
 }
 
 .dropzoneActive {
   border-color: var(--accent);
-  background: var(--accent-muted);
+  background-color: var(--accent-muted);
+  background-image: none;
   border-style: solid;
+  box-shadow: var(--focus-ring);
 }
 
 .uploadIcon {
@@ -121,11 +128,12 @@
   color: var(--text-primary);
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .input:focus {
   border-color: var(--accent);
+  box-shadow: var(--focus-ring);
 }
 
 .input::placeholder {
@@ -143,11 +151,12 @@
   font-family: inherit;
   resize: vertical;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
 
 .textarea:focus {
   border-color: var(--accent);
+  box-shadow: var(--focus-ring);
 }
 
 .textarea::placeholder {
@@ -160,19 +169,21 @@
   justify-content: center;
   gap: 6px;
   padding: 10px 20px;
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
   color: #fff;
   border: none;
   border-radius: var(--radius);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: opacity var(--transition-base), box-shadow var(--transition-base);
   width: fit-content;
+  box-shadow: var(--shadow-sm);
 }
 
 .button:hover:not(:disabled) {
-  background: var(--accent-hover);
+  opacity: 0.9;
+  box-shadow: var(--shadow-accent);
 }
 
 .button:disabled {

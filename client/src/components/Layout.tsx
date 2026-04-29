@@ -1,5 +1,14 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { Sparkles, Code, Heart, LogIn, LogOut, User } from "lucide-react";
+import {
+  Sparkles,
+  Code,
+  Heart,
+  LogIn,
+  LogOut,
+  User,
+  Search,
+  FileText,
+} from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import "../App.css";
@@ -19,62 +28,40 @@ export default function Layout() {
           <span className="navTag">AI</span>
         </Link>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div className="navActions">
+          <div className="navLinks">
+            <Link
+              to="/search"
+              className={`navLink ${location.pathname === "/search" ? "navLinkActive" : ""}`}
+            >
+              <Search size={14} />
+              Job Search
+            </Link>
+            <Link
+              to="/analyzer"
+              className={`navLink ${location.pathname === "/analyzer" ? "navLinkActive" : ""}`}
+            >
+              <FileText size={14} />
+              Analyzer
+            </Link>
+          </div>
+
           {isAuthenticated ? (
             <>
-              <span
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontSize: "0.85rem",
-                  color: "var(--text-secondary)",
-                }}
-              >
+              <span className="navUser">
                 <User size={14} />
                 {user?.fullName}
               </span>
-              <button
-                onClick={logout}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "6px 14px",
-                  background: "var(--bg-input)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  color: "var(--text-secondary)",
-                  fontSize: "0.8rem",
-                  cursor: "pointer",
-                  transition: "border-color 0.15s",
-                }}
-              >
+              <button onClick={logout} className="navBtnOutline">
                 <LogOut size={13} />
                 Logout
               </button>
             </>
           ) : (
-            <>
-              <Link
-                to="/login"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "6px 14px",
-                  background: "var(--accent)",
-                  borderRadius: 8,
-                  color: "#fff",
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                }}
-              >
-                <LogIn size={13} />
-                Sign In
-              </Link>
-            </>
+            <Link to="/login" className="navBtnPrimary">
+              <LogIn size={13} />
+              Sign In
+            </Link>
           )}
         </div>
       </nav>
@@ -95,13 +82,23 @@ export default function Layout() {
 
       <footer className="footer">
         <div className="footerContent">
+          <div className="footerNav">
+            <Link to="/search" className="footerNavLink">
+              Job Search
+            </Link>
+            <Link to="/analyzer" className="footerNavLink">
+              Analyzer
+            </Link>
+            {isAuthenticated && (
+              <Link to="/saved-analyses" className="footerNavLink">
+                Saved
+              </Link>
+            )}
+          </div>
           <div className="footerBrand">
             <Sparkles size={14} className="footerIcon" />
             <span>Resume Matcher</span>
           </div>
-          <p className="footerText">
-            AI-powered job search &amp; resume analysis
-          </p>
           <div className="footerBottom">
             <span className="footerMade">
               Made with <Heart size={12} className="footerHeart" /> using React

@@ -14,9 +14,10 @@
   width: 100%;
   max-width: 420px;
   padding: 36px 32px;
-  background: var(--bg-card);
+  background: linear-gradient(145deg, var(--bg-card) 0%, rgba(30, 30, 46, 0.7) 100%);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 .title {
@@ -59,28 +60,31 @@
   color: var(--text-primary);
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .input:focus {
   border-color: var(--accent);
+  box-shadow: var(--focus-ring);
 }
 
 .submitBtn {
   padding: 11px 0;
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: opacity var(--transition-fast), box-shadow var(--transition-fast);
   margin-top: 4px;
+  box-shadow: var(--shadow-sm);
 }
 
 .submitBtn:hover {
-  background: var(--accent-hover);
+  opacity: 0.9;
+  box-shadow: var(--shadow-accent);
 }
 
 .submitBtn:disabled {
@@ -123,12 +127,13 @@
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .oauthBtn:hover {
   border-color: var(--text-muted);
   background: var(--bg-hover);
+  box-shadow: var(--shadow-sm);
 }
 
 .error {
