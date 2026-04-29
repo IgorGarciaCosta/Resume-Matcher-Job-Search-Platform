@@ -1,8 +1,12 @@
 .splitLayout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: .6fr 1fr;
   gap: 20px;
   align-items: start;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding-left: 0;
+  padding-right: 20px;
 }
 
 @media (max-width: 1024px) {
@@ -21,7 +25,7 @@
   border: none;
   border-radius: 0;
   height: calc(100vh - 40px);
-  min-height: 500px;
+  min-height: 600px;
   overflow: hidden;
 }
 
