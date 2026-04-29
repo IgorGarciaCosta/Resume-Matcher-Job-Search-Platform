@@ -21,6 +21,7 @@ interface GeoFeature {
 interface GlobeViewProps {
   selectedCountry: CountryCoord | null;
   onCountryClick?: (iso: string, name: string) => void;
+  onBackgroundClick?: () => void;
 }
 
 const GEOJSON_URL =
@@ -45,6 +46,7 @@ const globeMaterial = new MeshPhongMaterial({
 export default memo(function GlobeView({
   selectedCountry,
   onCountryClick,
+  onBackgroundClick,
 }: GlobeViewProps) {
   const globeRef = useRef<unknown>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -150,7 +152,8 @@ export default memo(function GlobeView({
   const handleGlobeClick = useCallback(() => {
     setClickedIso(null);
     setClickedName("");
-  }, []);
+    onBackgroundClick?.();
+  }, [onBackgroundClick]);
 
   const getPolygonCapColor = useCallback(
     (feat: object) => {

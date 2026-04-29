@@ -41,7 +41,9 @@ export default function JobSearch() {
   const [toastKey, setToastKey] = useState(0);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(null);
   const jobsRef = useRef(jobs);
-  jobsRef.current = jobs;
+  useEffect(() => {
+    jobsRef.current = jobs;
+  }, [jobs]);
   const filtersRef = useRef<HTMLDivElement>(null);
 
   const handleJobSelect = (job: JobSearchResult, index: number) => {
@@ -59,6 +61,10 @@ export default function JobSearch() {
 
   const handleGlobeCountryClick = useCallback(
     (iso: string, name: string) => {
+      // Clear any job-based selection so globe click takes priority
+      setSelectedCountry(null);
+      setSelectedJobIndex(null);
+
       const matching = jobsRef.current.filter(
         (job) => resolveCountry(job.location)?.iso === iso,
       );
@@ -71,7 +77,6 @@ export default function JobSearch() {
         setGlobeFilterIso(iso);
         setGlobeFilterName(name);
         setCurrentPage(1);
-        setSelectedJobIndex(null);
       }
     },
     [showToast],
@@ -82,7 +87,13 @@ export default function JobSearch() {
     setGlobeFilterName("");
     setCurrentPage(1);
     setSelectedJobIndex(null);
+    setSelectedCountry(null);
   };
+
+  const handleGlobeBackgroundClick = useCallback(() => {
+    setSelectedCountry(null);
+    setSelectedJobIndex(null);
+  }, []);
 
   const JOBS_PER_PAGE = 5;
 
@@ -283,6 +294,7 @@ export default function JobSearch() {
         <GlobeView
           selectedCountry={selectedCountry}
           onCountryClick={handleGlobeCountryClick}
+          onBackgroundClick={handleGlobeBackgroundClick}
         />
       </aside>
 
