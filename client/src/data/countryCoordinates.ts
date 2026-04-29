@@ -274,8 +274,8 @@ export function resolveCountry(location: string): CountryCoord | null {
 
   const lower = location.toLowerCase().trim();
 
-  // Skip generic remote/worldwide
-  if (/\b(remote|worldwide|anywhere|global|earth)\b/.test(lower)) {
+  // Skip generic remote/worldwide/regions
+  if (/\b(remote|worldwide|anywhere|global|earth|europe|european|emea|latam|apac|asia|africa|americas|north america|south america|oceania|middle east|eu\b)/.test(lower)) {
     // But check for "Remote - Germany" pattern
     const parts = lower.split(/[-–,]/);
     if (parts.length > 1) {
@@ -309,10 +309,13 @@ function matchPart(text: string): CountryCoord | null {
   // Alias match
   if (ALIASES[text]) return COUNTRIES[ALIASES[text]];
 
-  // Check if any alias is contained within the text
+  // Check if any alias appears as a whole word within the text
   for (const [alias, code] of Object.entries(ALIASES)) {
-    if (alias.length >= 4 && text.includes(alias)) {
-      return COUNTRIES[code];
+    if (alias.length >= 4) {
+      const re = new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`);
+      if (re.test(text)) {
+        return COUNTRIES[code];
+      }
     }
   }
 

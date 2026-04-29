@@ -21,6 +21,7 @@ interface GeoFeature {
 interface GlobeViewProps {
   selectedCountry: CountryCoord | null;
   globeFilterIso?: string | null;
+  hasJobSelected?: boolean;
   onCountryClick?: (iso: string, name: string) => void;
   onBackgroundClick?: () => void;
 }
@@ -47,6 +48,7 @@ const globeMaterial = new MeshPhongMaterial({
 export default memo(function GlobeView({
   selectedCountry,
   globeFilterIso: externalFilterIso,
+  hasJobSelected = false,
   onCountryClick,
   onBackgroundClick,
 }: GlobeViewProps) {
@@ -97,8 +99,9 @@ export default memo(function GlobeView({
   // Use the ISO code directly from the resolved country data
   const selectedIso = selectedCountry?.iso ?? null;
 
-  // The active highlight ISO: job-selected takes priority, then globe-clicked
-  const activeIso = selectedIso ?? clickedIso;
+  // When a job is selected, only use its country (even if null).
+  // Only fall back to globe-clicked when no job is selected.
+  const activeIso = hasJobSelected ? selectedIso : (selectedIso ?? clickedIso);
 
   // Animate globe to selected country
   useEffect(() => {
@@ -240,7 +243,7 @@ export default memo(function GlobeView({
 
   return (
     <div ref={containerRef} className={styles.container}>
-      {(selectedCountry || clickedIso) && (
+      {(selectedCountry || (!hasJobSelected && clickedIso)) && (
         <div className={styles.countryBadge}>
           <span className={styles.badgeDot} />
           {selectedCountry ? selectedCountry.name : clickedName}
@@ -280,9 +283,11 @@ export default memo(function GlobeView({
           ringAltitude={0.03}
         />
       )}
-      {!selectedCountry && !clickedIso && countries.length > 0 && (
-        <div className={styles.hint}>Click a job to see its country</div>
-      )}
+      {!selectedCountry &&
+        (!clickedIso || hasJobSelected) &&
+        countries.length > 0 && (
+          <div className={styles.hint}>Click a job to see its country</div>
+        )}
     </div>
   );
 });

@@ -294,6 +294,7 @@ export default function JobSearch() {
         <GlobeView
           selectedCountry={selectedCountry}
           globeFilterIso={globeFilterIso}
+          hasJobSelected={selectedJobIndex !== null}
           onCountryClick={handleGlobeCountryClick}
           onBackgroundClick={handleGlobeBackgroundClick}
         />
