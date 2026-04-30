@@ -43,6 +43,20 @@ public class JobSearchService
             ).ToList();
         }
 
+        // Filter remote-only (safety-net for providers that don't filter server-side)
+        if (request.RemoteOnly)
+        {
+            allJobs = allJobs.Where(j =>
+                (!string.IsNullOrWhiteSpace(j.Location) &&
+                    (j.Location.Contains("Remote", StringComparison.OrdinalIgnoreCase) ||
+                     j.Location.Contains("Anywhere", StringComparison.OrdinalIgnoreCase) ||
+                     j.Location.Contains("Worldwide", StringComparison.OrdinalIgnoreCase))) ||
+                string.Equals(j.JobType, "remote", StringComparison.OrdinalIgnoreCase) ||
+                (!string.IsNullOrWhiteSpace(j.Title) &&
+                    j.Title.Contains("Remote", StringComparison.OrdinalIgnoreCase))
+            ).ToList();
+        }
+
         // Deduplicate by title + company (case-insensitive)
         var deduplicated = allJobs
             .GroupBy(j => $"{j.Title.ToLowerInvariant()}|{j.Company.ToLowerInvariant()}")
