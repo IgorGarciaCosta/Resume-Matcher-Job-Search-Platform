@@ -287,6 +287,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+.activeFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .filterBadge {
   display: inline-flex;
   align-items: center;

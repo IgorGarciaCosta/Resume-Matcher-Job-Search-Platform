@@ -117,7 +117,7 @@ export default function Layout() {
               &amp; .NET
             </span>
             <a
-              href="https://github.com"
+              href="https://github.com/IgorGarciaCosta/Resume-Matcher-Job-Search-Platform"
               target="_blank"
               rel="noopener noreferrer"
               className="footerLink"

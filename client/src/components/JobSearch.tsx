@@ -120,8 +120,11 @@ export default function JobSearch() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const executeSearch = async (overrides?: {
+    location?: string;
+    remoteOnly?: boolean;
+  }) => {
+    if (!query.trim()) return;
     setLoading(true);
     setError("");
     setSearched(true);
@@ -132,8 +135,8 @@ export default function JobSearch() {
     try {
       const res = await searchJobs({
         query,
-        location,
-        remoteOnly,
+        location: overrides?.location ?? location,
+        remoteOnly: overrides?.remoteOnly ?? remoteOnly,
         pageSize: 200,
       });
       setJobs(res.jobs);
@@ -146,6 +149,21 @@ export default function JobSearch() {
       setLoading(false);
     }
   };
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    executeSearch();
+  };
+
+  // Auto-search when remoteOnly changes (immediate)
+  useEffect(() => {
+    if (!searched) return;
+    const timer = setTimeout(() => {
+      executeSearch();
+    }, 0);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remoteOnly]);
 
   return (
     <div className={styles.splitLayout}>
@@ -192,6 +210,12 @@ export default function JobSearch() {
                       placeholder="Location..."
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          executeSearch();
+                        }
+                      }}
                       className={styles.input}
                     />
                   </div>
@@ -219,6 +243,34 @@ export default function JobSearch() {
             Search
           </button>
         </form>
+
+        {(location || remoteOnly) && (
+          <div className={styles.activeFilters}>
+            {location && (
+              <button
+                className={styles.filterBadge}
+                onClick={() => {
+                  setLocation("");
+                  executeSearch({ location: "" });
+                }}
+              >
+                <MapPin size={13} />
+                {location}
+                <X size={13} />
+              </button>
+            )}
+            {remoteOnly && (
+              <button
+                className={styles.filterBadge}
+                onClick={() => setRemoteOnly(false)}
+              >
+                <Wifi size={13} />
+                Remote only
+                <X size={13} />
+              </button>
+            )}
+          </div>
+        )}
 
         {error && <div className={styles.error}>{error}</div>}
 
