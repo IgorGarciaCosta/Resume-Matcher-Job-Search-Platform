@@ -11,9 +11,9 @@ using ResumeMatcher.Api.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── EF Core + SQLite ──────────────────────────────────────────────────────────
+// ── EF Core + PostgreSQL ──────────────────────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ── ASP.NET Identity ──────────────────────────────────────────────────────────
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
