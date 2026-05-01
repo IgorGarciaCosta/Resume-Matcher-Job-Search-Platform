@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
+import ProfileDrawer from "./ProfileDrawer";
 import "../App.css";
 
 /**
@@ -28,6 +29,7 @@ function FrozenOutlet() {
 export default function Layout() {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <div className="app">
@@ -60,10 +62,10 @@ export default function Layout() {
 
           {isAuthenticated ? (
             <>
-              <span className="navUser">
+              <button className="navUser" onClick={() => setDrawerOpen(true)}>
                 <User size={14} />
                 {user?.fullName}
-              </span>
+              </button>
               <button onClick={logout} className="navBtnOutline">
                 <LogOut size={13} />
                 Logout
@@ -77,6 +79,8 @@ export default function Layout() {
           )}
         </div>
       </nav>
+
+      <ProfileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
       <main className="main">
         <AnimatePresence mode="wait">
