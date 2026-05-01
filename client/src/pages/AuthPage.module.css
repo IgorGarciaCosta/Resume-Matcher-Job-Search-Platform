@@ -161,6 +161,34 @@
   text-decoration: underline;
 }
 
+.passwordWrapper {
+  position: relative;
+}
+
+.passwordWrapper .input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color var(--transition-fast);
+}
+
+.eyeBtn:hover {
+  color: var(--text-primary);
+}
+
 @media (max-width: 480px) {
   .card {
     padding: 28px 20px;
