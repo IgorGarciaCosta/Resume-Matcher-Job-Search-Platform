@@ -162,26 +162,22 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// ── Auto-apply pending migrations on startup ─────────────────────────────────
+// ── Auto-apply pending migrations / ensure schema on startup ─────────────────
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    // Try to apply migrations first (works for fresh DBs or DBs with migration history)
+    try { db.Database.Migrate(); }
+    catch { db.Database.EnsureCreated(); }
+
+    // Always ensure new columns exist (handles DBs originally created with EnsureCreated)
     try
     {
-        db.Database.Migrate();
+        db.Database.ExecuteSqlRaw(
+            @"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""PhotoBase64"" text;");
     }
-    catch
-    {
-        // Fallback: DB may have been created with EnsureCreated (no migration history).
-        // Ensure schema is up-to-date by adding missing columns directly.
-        db.Database.EnsureCreated();
-        try
-        {
-            db.Database.ExecuteSqlRaw(
-                @"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""PhotoBase64"" text;");
-        }
-        catch { /* Column may already exist */ }
-    }
+    catch { /* Column already exists or DB provider doesn't support IF NOT EXISTS */ }
 }
 
 app.Run();
