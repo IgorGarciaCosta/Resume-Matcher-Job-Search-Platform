@@ -11,7 +11,6 @@ import {
   register as apiRegister,
   logout as apiLogout,
   getMe,
-  getExternalLoginUrl,
   type User,
 } from "../services/api";
 
@@ -26,7 +25,6 @@ interface AuthContextType {
     fullName: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
-  loginWithGoogle: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -73,10 +71,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
-  const loginWithGoogle = () => {
-    window.location.href = getExternalLoginUrl("Google");
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -86,7 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         logout,
-        loginWithGoogle,
       }}
     >
       {children}

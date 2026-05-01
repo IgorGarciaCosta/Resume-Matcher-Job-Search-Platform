@@ -68,11 +68,6 @@ export async function getMe(): Promise<User> {
   return res.json();
 }
 
-/** Returns the backend URL that initiates an OAuth redirect for the given provider. */
-export function getExternalLoginUrl(provider: string): string {
-  return `${API_BASE}/auth/external/${provider}`;
-}
-
 // ── Job Search Types ──────────────────────────────────────────────────────────
 
 export interface JobSearchResult {

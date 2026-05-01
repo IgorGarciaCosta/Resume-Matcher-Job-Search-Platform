@@ -6,7 +6,6 @@ import ResumeAnalyzerPage from "./pages/ResumeAnalyzerPage";
 import SavedAnalysesPage from "./pages/SavedAnalysesPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import OAuthCallbackPage from "./pages/OAuthCallbackPage";
 
 export const router = createBrowserRouter([
   {
@@ -18,7 +17,6 @@ export const router = createBrowserRouter([
       { path: "/saved-analyses", element: <SavedAnalysesPage /> },
       { path: "/login", element: <LoginPage /> },
       { path: "/signup", element: <SignupPage /> },
-      { path: "/auth/callback", element: <OAuthCallbackPage /> },
     ],
   },
 ]);

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,7 @@ using ResumeMatcher.Api.Domain.Entities;
 namespace ResumeMatcher.Api.Controllers;
 
 /// <summary>
-/// Authentication API. Handles email/password registration and login, OAuth flows (Google, LinkedIn),
+/// Authentication API. Handles email/password registration and login,
 /// session management via HttpOnly JWT cookies, and current-user retrieval.
 /// </summary>
 [ApiController]
@@ -19,19 +18,13 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly string _clientBaseUrl;
 
     public AuthController(
         IAuthService authService,
-        UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager,
-        IConfiguration configuration)
+        UserManager<ApplicationUser> userManager)
     {
         _authService = authService;
         _userManager = userManager;
-        _signInManager = signInManager;
-        _clientBaseUrl = configuration["ClientApp:BaseUrl"] ?? "http://localhost:5173";
     }
 
     /// <summary>Registers a new user, generates a JWT, and sets it as an HttpOnly cookie.</summary>
@@ -89,72 +82,6 @@ public class AuthController : ControllerBase
             return Unauthorized();
 
         return Ok(user);
-    }
-
-    /// <summary>Initiates an OAuth challenge, redirecting the user to the external provider (Google/LinkedIn).</summary>
-    [HttpGet("external/{provider}")]
-    public IActionResult ExternalLogin(string provider)
-    {
-        var redirectUrl = Url.Action(nameof(ExternalLoginCallback));
-        var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-        return Challenge(properties, provider);
-    }
-
-    /// <summary>
-    /// Handles the OAuth callback. Creates or links the user account, sets the JWT cookie,
-    /// and redirects to the frontend callback page.
-    /// </summary>
-    [HttpGet("external/callback")]
-    public async Task<IActionResult> ExternalLoginCallback()
-    {
-        var info = await _signInManager.GetExternalLoginInfoAsync();
-        if (info is null)
-            return Redirect($"{_clientBaseUrl}/login?error=external_login_failed");
-
-        // Try to sign in with the external login
-        var signInResult = await _signInManager.ExternalLoginSignInAsync(
-            info.LoginProvider, info.ProviderKey, isPersistent: false);
-
-        ApplicationUser? user;
-
-        if (signInResult.Succeeded)
-        {
-            user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
-        }
-        else
-        {
-            // Create new user from external provider
-            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? "User";
-
-            if (email is null)
-                return Redirect($"{_clientBaseUrl}/login?error=no_email");
-
-            user = await _userManager.FindByEmailAsync(email);
-            if (user is null)
-            {
-                user = new ApplicationUser
-                {
-                    UserName = email,
-                    Email = email,
-                    FullName = name,
-                    EmailConfirmed = true
-                };
-                var createResult = await _userManager.CreateAsync(user);
-                if (!createResult.Succeeded)
-                    return Redirect($"{_clientBaseUrl}/login?error=creation_failed");
-            }
-
-            await _userManager.AddLoginAsync(user, info);
-        }
-
-        if (user is null)
-            return Redirect($"{_clientBaseUrl}/login?error=user_not_found");
-
-        var token = _authService.GenerateJwtToken(user.Id, user.Email!, user.FullName);
-        SetTokenCookie(token);
-
-        return Redirect($"{_clientBaseUrl}/auth/callback");
     }
 
     /// <summary>Appends a signed JWT as an HttpOnly, SameSite=Lax cookie with 24h expiration.</summary>
