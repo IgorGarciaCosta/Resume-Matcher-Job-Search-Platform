@@ -11,6 +11,7 @@ import {
   register as apiRegister,
   logout as apiLogout,
   getMe,
+  updateProfile as apiUpdateProfile,
   type User,
 } from "../services/api";
 
@@ -25,7 +26,7 @@ interface AuthContextType {
     fullName: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
-  updateUser: (partial: Partial<User>) => void;
+  updateUser: (partial: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -72,8 +73,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
-  const updateUser = (partial: Partial<User>) => {
-    setUser((prev) => (prev ? { ...prev, ...partial } : prev));
+  const updateUser = async (partial: Partial<User>) => {
+    const updated = await apiUpdateProfile({
+      fullName: partial.fullName,
+      photoBase64: partial.photoBase64,
+    });
+    setUser(updated);
   };
 
   return (

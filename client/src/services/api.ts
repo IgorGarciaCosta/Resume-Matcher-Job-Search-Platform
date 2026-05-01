@@ -7,6 +7,7 @@ export interface User {
   id: string;
   email: string;
   fullName: string;
+  photoBase64?: string | null;
 }
 
 /** Standardized backend response for login/register operations. */
@@ -65,6 +66,24 @@ export async function getMe(): Promise<User> {
     credentials: "include",
   });
   if (!res.ok) throw new Error("Not authenticated");
+  return res.json();
+}
+
+/** Updates the authenticated user's profile (name and/or photo). */
+export async function updateProfile(data: {
+  fullName?: string;
+  photoBase64?: string | null;
+}): Promise<User> {
+  const res = await fetch(`${API_BASE}/auth/profile`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Failed to update profile");
+  }
   return res.json();
 }
 

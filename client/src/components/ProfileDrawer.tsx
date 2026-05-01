@@ -21,6 +21,7 @@ export default function ProfileDrawer({ open, onClose }: ProfileDrawerProps) {
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleEdit = () => {
@@ -34,12 +35,21 @@ export default function ProfileDrawer({ open, onClose }: ProfileDrawerProps) {
     setPhotoPreview(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmed = editName.trim();
-    if (trimmed) {
-      updateUser({ fullName: trimmed });
+    if (!trimmed) return;
+    setSaving(true);
+    try {
+      await updateUser({
+        fullName: trimmed,
+        photoBase64: photoPreview ?? user?.photoBase64 ?? null,
+      });
+    } catch {
+      // silently fail for now
+    } finally {
+      setSaving(false);
+      setEditing(false);
     }
-    setEditing(false);
   };
 
   const handlePhotoChange = useCallback(
@@ -93,9 +103,15 @@ export default function ProfileDrawer({ open, onClose }: ProfileDrawerProps) {
             <div className={styles.body}>
               {/* Avatar */}
               <div className={styles.avatar}>
-                {photoPreview ? (
+                {editing && photoPreview ? (
                   <img
                     src={photoPreview}
+                    alt="Avatar"
+                    className={styles.avatarImg}
+                  />
+                ) : user.photoBase64 ? (
+                  <img
+                    src={user.photoBase64}
                     alt="Avatar"
                     className={styles.avatarImg}
                   />
@@ -144,9 +160,13 @@ export default function ProfileDrawer({ open, onClose }: ProfileDrawerProps) {
               <div className={styles.actions}>
                 {editing ? (
                   <>
-                    <button className={styles.btnPrimary} onClick={handleSave}>
+                    <button
+                      className={styles.btnPrimary}
+                      onClick={handleSave}
+                      disabled={saving}
+                    >
                       <Check size={14} />
-                      Save
+                      {saving ? "Saving…" : "Save"}
                     </button>
                     <button
                       className={styles.btnOutline}

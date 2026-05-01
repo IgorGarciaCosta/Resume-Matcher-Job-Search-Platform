@@ -50,7 +50,7 @@ public class AuthService : IAuthService
         {
             Success = true,
             Message = "Registration successful.",
-            User = new UserDto { Id = user.Id, Email = user.Email!, FullName = user.FullName }
+            User = new UserDto { Id = user.Id, Email = user.Email!, FullName = user.FullName, PhotoBase64 = user.PhotoBase64 }
         };
     }
 
@@ -69,7 +69,7 @@ public class AuthService : IAuthService
         {
             Success = true,
             Message = "Login successful.",
-            User = new UserDto { Id = user.Id, Email = user.Email!, FullName = user.FullName }
+            User = new UserDto { Id = user.Id, Email = user.Email!, FullName = user.FullName, PhotoBase64 = user.PhotoBase64 }
         };
     }
 
@@ -79,7 +79,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null) return null;
 
-        return new UserDto { Id = user.Id, Email = user.Email!, FullName = user.FullName };
+        return new UserDto { Id = user.Id, Email = user.Email!, FullName = user.FullName, PhotoBase64 = user.PhotoBase64 };
     }
 
     /// <summary>Builds a signed JWT with sub/email/fullName claims. Expiration is read from appsettings (default 24h).</summary>

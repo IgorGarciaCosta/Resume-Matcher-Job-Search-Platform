@@ -8,5 +8,6 @@ namespace ResumeMatcher.Api.Domain.Entities;
 public class ApplicationUser : IdentityUser
 {
     public string FullName { get; set; } = string.Empty;
+    public string? PhotoBase64 { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

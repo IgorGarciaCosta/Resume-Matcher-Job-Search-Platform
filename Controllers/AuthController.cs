@@ -85,6 +85,42 @@ public class AuthController : ControllerBase
         return Ok(user);
     }
 
+    /// <summary>Updates the authenticated user's profile (name and/or photo).</summary>
+    [Authorize]
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequestDto request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? User.FindFirstValue("sub");
+        if (userId is null)
+            return Unauthorized();
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return Unauthorized();
+
+        if (!string.IsNullOrWhiteSpace(request.FullName))
+            user.FullName = request.FullName.Trim();
+
+        user.PhotoBase64 = request.PhotoBase64;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+            return BadRequest(new { message = "Failed to update profile." });
+
+        // Re-issue JWT with updated claims
+        var token = _authService.GenerateJwtToken(user.Id, user.Email!, user.FullName);
+        SetTokenCookie(token);
+
+        return Ok(new UserDto
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            FullName = user.FullName,
+            PhotoBase64 = user.PhotoBase64
+        });
+    }
+
     /// <summary>Appends a signed JWT as an HttpOnly, SameSite=None cookie with 24h expiration.</summary>
     private void SetTokenCookie(string token)
     {
