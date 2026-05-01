@@ -7,7 +7,7 @@ WORKDIR /src
 COPY ["ResumeMatcher.Api.csproj", "."]
 RUN dotnet restore
 COPY . .
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish ResumeMatcher.Api.csproj -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
