@@ -62,7 +62,8 @@ public class AuthController : ControllerBase
         Response.Cookies.Delete("access_token", new CookieOptions
         {
             Path = "/",
-            SameSite = SameSiteMode.Lax
+            Secure = true,
+            SameSite = SameSiteMode.None
         });
         return Ok(new { message = "Logged out successfully." });
     }
@@ -84,14 +85,14 @@ public class AuthController : ControllerBase
         return Ok(user);
     }
 
-    /// <summary>Appends a signed JWT as an HttpOnly, SameSite=Lax cookie with 24h expiration.</summary>
+    /// <summary>Appends a signed JWT as an HttpOnly, SameSite=None cookie with 24h expiration.</summary>
     private void SetTokenCookie(string token)
     {
         Response.Cookies.Append("access_token", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false, // Set to true in production with HTTPS
-            SameSite = SameSiteMode.Lax,
+            Secure = true,
+            SameSite = SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddHours(24),
             Path = "/"
         });
