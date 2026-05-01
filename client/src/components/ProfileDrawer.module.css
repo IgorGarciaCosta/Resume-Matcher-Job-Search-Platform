@@ -100,10 +100,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.45);
   border-radius: 50%;
   cursor: pointer;
-  opacity: 0;
+  opacity: 0.7;
   transition: opacity var(--transition-fast);
 }
 
