@@ -12,8 +12,21 @@ using ResumeMatcher.Api.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── EF Core + PostgreSQL ──────────────────────────────────────────────────────
+string GetConnectionString()
+{
+    // Render provides DATABASE_URL in postgres:// format
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    if (!string.IsNullOrEmpty(databaseUrl))
+    {
+        var uri = new Uri(databaseUrl);
+        var userInfo = uri.UserInfo.Split(':');
+        return $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+    }
+    return builder.Configuration.GetConnectionString("DefaultConnection")!;
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(GetConnectionString()));
 
 // ── ASP.NET Identity ──────────────────────────────────────────────────────────
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
