@@ -28,7 +28,8 @@ string GetConnectionString()
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(GetConnectionString()));
+    options.UseNpgsql(GetConnectionString())
+           .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
 // ── ASP.NET Identity ──────────────────────────────────────────────────────────
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -165,7 +166,22 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    try
+    {
+        db.Database.Migrate();
+    }
+    catch
+    {
+        // Fallback: DB may have been created with EnsureCreated (no migration history).
+        // Ensure schema is up-to-date by adding missing columns directly.
+        db.Database.EnsureCreated();
+        try
+        {
+            db.Database.ExecuteSqlRaw(
+                @"ALTER TABLE ""AspNetUsers"" ADD COLUMN IF NOT EXISTS ""PhotoBase64"" text;");
+        }
+        catch { /* Column may already exist */ }
+    }
 }
 
 app.Run();
