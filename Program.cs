@@ -125,7 +125,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(corsOrigins)
+        policy.SetIsOriginAllowed(origin =>
+              {
+                  var uri = new Uri(origin);
+                  return corsOrigins.Contains(origin)
+                         || uri.Host.EndsWith(".vercel.app");
+              })
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
