@@ -9,6 +9,7 @@ using ResumeMatcher.Api.Application.Services;
 using ResumeMatcher.Api.Domain.Entities;
 using ResumeMatcher.Api.Infrastructure.Data;
 using ResumeMatcher.Api.Infrastructure.Services;
+using ResumeMatcher.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -144,6 +145,9 @@ var forwardedHeadersOptions = new ForwardedHeadersOptions
 forwardedHeadersOptions.KnownNetworks.Clear();
 forwardedHeadersOptions.KnownProxies.Clear();
 app.UseForwardedHeaders(forwardedHeadersOptions);
+
+// ── Global Exception Handling ─────────────────────────────────────────────────
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // ── Middleware Pipeline ───────────────────────────────────────────────────────
 if (app.Environment.IsDevelopment())

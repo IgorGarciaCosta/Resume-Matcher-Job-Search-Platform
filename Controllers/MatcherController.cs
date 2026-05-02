@@ -1,5 +1,3 @@
-using System.ClientModel;
-using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using ResumeMatcher.Api.Application.DTOs;
 using ResumeMatcher.Api.Application.Services;
@@ -18,72 +16,23 @@ public class MatcherController : ControllerBase
     }
 
     /// <summary>
-    /// Analisa o match entre um currículo (PDF) e uma vaga de emprego.
-    /// Envie o PDF do currículo + URL da vaga OU texto da descrição da vaga.
+    /// Analyzes the match between a resume (PDF) and a job posting.
+    /// Send the resume PDF + job URL OR job description text.
     /// </summary>
     [HttpPost("analyze")]
     [ProducesResponseType(typeof(MatchResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Analyze([FromForm] MatchUploadDto upload)
     {
-        try
+        var request = new MatchRequestDto
         {
-            var request = new MatchRequestDto
-            {
-                ResumeStream = upload.ResumeFile?.OpenReadStream(),
-                ResumeFileName = upload.ResumeFile?.FileName,
-                JobUrl = upload.JobUrl,
-                JobText = upload.JobText,
-            };
+            ResumeStream = upload.ResumeFile?.OpenReadStream(),
+            ResumeFileName = upload.ResumeFile?.FileName,
+            JobUrl = upload.JobUrl,
+            JobText = upload.JobText,
+        };
 
-            var result = await _matcherService.AnalyzeAsync(request);
-            return Ok(result);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Requisição inválida",
-                Detail = ex.Message,
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-        catch (NotImplementedException ex)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Funcionalidade não disponível",
-                Detail = ex.Message,
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Erro no processamento",
-                Detail = ex.Message,
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-        catch (ClientResultException ex)
-        {
-            return StatusCode(StatusCodes.Status502BadGateway, new ProblemDetails
-            {
-                Title = "Erro na API de IA",
-                Detail = $"A API do Gemini retornou erro ({ex.Status}). Tente novamente em alguns instantes.",
-                Status = StatusCodes.Status502BadGateway
-            });
-        }
-        catch (JsonException)
-        {
-            return StatusCode(StatusCodes.Status502BadGateway, new ProblemDetails
-            {
-                Title = "Erro na API de IA",
-                Detail = "A IA retornou uma resposta inválida. Tente novamente em alguns instantes.",
-                Status = StatusCodes.Status502BadGateway
-            });
-        }
+        var result = await _matcherService.AnalyzeAsync(request);
+        return Ok(result);
     }
-
 }
