@@ -1,10 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ResumeMatcher.Api.Application.DTOs;
-using ResumeMatcher.Api.Domain.Entities;
-using ResumeMatcher.Api.Infrastructure.Data;
+using ResumeMatcher.Api.Application.Interfaces;
 
 namespace ResumeMatcher.Api.Controllers;
 
@@ -13,11 +11,11 @@ namespace ResumeMatcher.Api.Controllers;
 [Route("api/[controller]")]
 public class AnalysisController : ControllerBase
 {
-    private readonly AppDbContext _db;
+    private readonly ISavedAnalysisService _analysisService;
 
-    public AnalysisController(AppDbContext db)
+    public AnalysisController(ISavedAnalysisService analysisService)
     {
-        _db = db;
+        _analysisService = analysisService;
     }
 
     private string GetUserId() =>
@@ -38,26 +36,8 @@ public class AnalysisController : ControllerBase
             return BadRequest(new ProblemDetails { Title = "Score must be between 0 and 100." });
 
         var userId = GetUserId();
+        var dto = await _analysisService.SaveAsync(userId, request);
 
-        var entity = new SavedAnalysis
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            ResumeFileName = request.ResumeFileName,
-            JobSource = request.JobSource.Length > 2048
-                ? request.JobSource[..2048]
-                : request.JobSource,
-            Score = request.Score,
-            MatchingKeywords = request.MatchingKeywords,
-            MissingKeywords = request.MissingKeywords,
-            ImprovementSuggestions = request.ImprovementSuggestions,
-            AnalyzedAt = DateTime.UtcNow,
-        };
-
-        _db.SavedAnalyses.Add(entity);
-        await _db.SaveChangesAsync();
-
-        var dto = MapToDto(entity);
         return CreatedAtAction(nameof(GetById), new { id = dto.Id }, dto);
     }
 
@@ -67,13 +47,8 @@ public class AnalysisController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var userId = GetUserId();
-
-        var analyses = await _db.SavedAnalyses
-            .Where(a => a.UserId == userId)
-            .OrderByDescending(a => a.AnalyzedAt)
-            .ToListAsync();
-
-        return Ok(analyses.Select(MapToDto));
+        var analyses = await _analysisService.GetAllByUserAsync(userId);
+        return Ok(analyses);
     }
 
     /// <summary>Returns a single saved analysis by ID (must belong to the authenticated user).</summary>
@@ -83,14 +58,12 @@ public class AnalysisController : ControllerBase
     public async Task<IActionResult> GetById(Guid id)
     {
         var userId = GetUserId();
+        var dto = await _analysisService.GetByIdAsync(id, userId);
 
-        var entity = await _db.SavedAnalyses
-            .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
-
-        if (entity is null)
+        if (dto is null)
             return NotFound();
 
-        return Ok(MapToDto(entity));
+        return Ok(dto);
     }
 
     /// <summary>Deletes a saved analysis by ID (must belong to the authenticated user).</summary>
@@ -100,28 +73,11 @@ public class AnalysisController : ControllerBase
     public async Task<IActionResult> Delete(Guid id)
     {
         var userId = GetUserId();
+        var deleted = await _analysisService.DeleteAsync(id, userId);
 
-        var entity = await _db.SavedAnalyses
-            .FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
-
-        if (entity is null)
+        if (!deleted)
             return NotFound();
-
-        _db.SavedAnalyses.Remove(entity);
-        await _db.SaveChangesAsync();
 
         return NoContent();
     }
-
-    private static SavedAnalysisDto MapToDto(SavedAnalysis entity) => new()
-    {
-        Id = entity.Id,
-        ResumeFileName = entity.ResumeFileName,
-        JobSource = entity.JobSource,
-        Score = entity.Score,
-        MatchingKeywords = entity.MatchingKeywords,
-        MissingKeywords = entity.MissingKeywords,
-        ImprovementSuggestions = entity.ImprovementSuggestions,
-        AnalyzedAt = entity.AnalyzedAt,
-    };
 }

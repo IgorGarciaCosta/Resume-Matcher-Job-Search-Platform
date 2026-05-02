@@ -78,6 +78,7 @@ builder.Services.AddAuthentication(options =>
 
 // ── Dependency Injection ──────────────────────────────────────────────────────
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISavedAnalysisService, SavedAnalysisService>();
 builder.Services.AddScoped<IPdfExtractorService, PdfExtractorService>();
 builder.Services.AddScoped<IAiAnalyzerService, GeminiAnalyzerService>();
 builder.Services.AddHttpClient("JobScraper", client =>

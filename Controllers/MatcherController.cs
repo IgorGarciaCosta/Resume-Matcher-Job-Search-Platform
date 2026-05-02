@@ -24,10 +24,18 @@ public class MatcherController : ControllerBase
     [HttpPost("analyze")]
     [ProducesResponseType(typeof(MatchResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Analyze([FromForm] MatchRequestDto request)
+    public async Task<IActionResult> Analyze([FromForm] MatchUploadDto upload)
     {
         try
         {
+            var request = new MatchRequestDto
+            {
+                ResumeStream = upload.ResumeFile?.OpenReadStream(),
+                ResumeFileName = upload.ResumeFile?.FileName,
+                JobUrl = upload.JobUrl,
+                JobText = upload.JobText,
+            };
+
             var result = await _matcherService.AnalyzeAsync(request);
             return Ok(result);
         }

@@ -22,11 +22,10 @@ public class MatcherService
     public async Task<MatchResultDto> AnalyzeAsync(MatchRequestDto request)
     {
         // 1. Extrair texto do PDF
-        if (request.ResumeFile is null || request.ResumeFile.Length == 0)
+        if (request.ResumeStream is null || request.ResumeStream.Length == 0)
             throw new ArgumentException("Um arquivo PDF de currículo é obrigatório.");
 
-        using var stream = request.ResumeFile.OpenReadStream();
-        var resumeText = await _pdfExtractor.ExtractTextAsync(stream);
+        var resumeText = await _pdfExtractor.ExtractTextAsync(request.ResumeStream);
 
         if (string.IsNullOrWhiteSpace(resumeText))
             throw new InvalidOperationException("Não foi possível extrair texto do PDF. Verifique se o arquivo é um PDF válido.");

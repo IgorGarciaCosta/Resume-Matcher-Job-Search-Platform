@@ -103,7 +103,7 @@ export default function ProfileDrawer({ open, onClose }: ProfileDrawerProps) {
             <div className={styles.body}>
               {/* Avatar */}
               <div className={styles.avatar}>
-                {(photoPreview || user.photoBase64) ? (
+                {photoPreview || user.photoBase64 ? (
                   <img
                     src={photoPreview ?? user.photoBase64!}
                     alt="Avatar"

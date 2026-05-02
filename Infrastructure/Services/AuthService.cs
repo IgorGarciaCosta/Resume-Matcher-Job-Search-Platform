@@ -8,7 +8,7 @@ using ResumeMatcher.Api.Application.DTOs.Auth;
 using ResumeMatcher.Api.Application.Interfaces;
 using ResumeMatcher.Api.Domain.Entities;
 
-namespace ResumeMatcher.Api.Application.Services;
+namespace ResumeMatcher.Api.Infrastructure.Services;
 
 /// <summary>
 /// Handles user registration, login validation, and JWT token generation.

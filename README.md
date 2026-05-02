@@ -41,19 +41,19 @@ An intelligent full-stack application that aggregates remote job listings from *
 
 ## Tech Stack
 
-| Layer            | Technology                                      |
-| ---------------- | ----------------------------------------------- |
-| **Backend**      | ASP.NET Core 9, C#                              |
-| **Frontend**     | React 19, TypeScript 6, Vite 8                  |
-| **Database**     | PostgreSQL + Entity Framework Core 9             |
-| **Auth**         | ASP.NET Identity + JWT (HttpOnly cookies)        |
-| **AI**           | Google Gemini (`gemini-2.5-flash`)              |
-| **PDF Parsing**  | PdfPig                                          |
-| **Web Scraping** | HtmlAgilityPack                                 |
-| **Styling**      | CSS Modules + Lucide React icons                |
-| **Animations**   | Framer Motion                                   |
-| **3D**           | Three.js + react-globe.gl                       |
-| **Deployment**   | Docker (Render) + Vercel (frontend)             |
+| Layer            | Technology                                |
+| ---------------- | ----------------------------------------- |
+| **Backend**      | ASP.NET Core 9, C#                        |
+| **Frontend**     | React 19, TypeScript 6, Vite 8            |
+| **Database**     | PostgreSQL + Entity Framework Core 9      |
+| **Auth**         | ASP.NET Identity + JWT (HttpOnly cookies) |
+| **AI**           | Google Gemini (`gemini-2.5-flash`)        |
+| **PDF Parsing**  | PdfPig                                    |
+| **Web Scraping** | HtmlAgilityPack                           |
+| **Styling**      | CSS Modules + Lucide React icons          |
+| **Animations**   | Framer Motion                             |
+| **3D**           | Three.js + react-globe.gl                 |
+| **Deployment**   | Docker (Render) + Vercel (frontend)       |
 
 ## Project Structure
 
@@ -143,10 +143,10 @@ The frontend starts at **http://localhost:5173**.
 
 ## Deployment
 
-| Service  | Platform | Notes                                          |
-| -------- | -------- | ---------------------------------------------- |
+| Service  | Platform | Notes                                              |
+| -------- | -------- | -------------------------------------------------- |
 | Backend  | Render   | Docker deploy, `DATABASE_URL` env var for Postgres |
-| Frontend | Vercel   | SPA with catch-all rewrite to `index.html`     |
+| Frontend | Vercel   | SPA with catch-all rewrite to `index.html`         |
 
 The backend auto-detects `DATABASE_URL` (Render format) and converts it to a Npgsql connection string.
 
