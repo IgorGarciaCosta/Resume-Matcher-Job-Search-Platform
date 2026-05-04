@@ -61,14 +61,14 @@ An intelligent full-stack application that aggregates remote job listings from *
 ├── Application/
 │   ├── DTOs/                        # Data Transfer Objects (inc. Auth/)
 │   ├── Interfaces/                  # Service contracts
-│   └── Services/                    # Business logic (JobSearchService, MatcherService, AuthService)
+│   └── Services/                    # Business logic (JobSearchService, MatcherService, SavedAnalysisService)
 ├── Controllers/
 │   ├── AuthController.cs            # POST /api/auth/register, login, logout; GET /api/auth/me
 │   ├── AnalysisController.cs        # POST/GET /api/analysis (saved analyses)
 │   ├── JobSearchController.cs       # GET  /api/jobsearch/search
 │   └── MatcherController.cs         # POST /api/matcher/analyze
 ├── Domain/
-│   ├── Entities/                    # ApplicationUser, Resume, JobDescription, SavedAnalysis
+│   ├── Entities/                    # ApplicationUser, SavedAnalysis
 │   └── Enums/
 ├── Infrastructure/
 │   ├── Data/                        # EF Core DbContext (PostgreSQL)
