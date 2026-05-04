@@ -3,7 +3,7 @@ using ResumeMatcher.Api.Application.Interfaces;
 
 namespace ResumeMatcher.Api.Application.Services;
 
-public class JobSearchService
+public class JobSearchService : IJobSearchService
 {
     private readonly IEnumerable<IJobSearchProvider> _providers;
     private readonly ILogger<JobSearchService> _logger;

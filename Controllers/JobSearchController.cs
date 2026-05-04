@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ResumeMatcher.Api.Application.DTOs;
-using ResumeMatcher.Api.Application.Services;
+using ResumeMatcher.Api.Application.Interfaces;
 
 namespace ResumeMatcher.Api.Controllers;
 
@@ -8,9 +8,9 @@ namespace ResumeMatcher.Api.Controllers;
 [Route("api/[controller]")]
 public class JobSearchController : ControllerBase
 {
-    private readonly JobSearchService _jobSearchService;
+    private readonly IJobSearchService _jobSearchService;
 
-    public JobSearchController(JobSearchService jobSearchService)
+    public JobSearchController(IJobSearchService jobSearchService)
     {
         _jobSearchService = jobSearchService;
     }

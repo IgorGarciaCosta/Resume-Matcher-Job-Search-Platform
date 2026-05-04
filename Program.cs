@@ -90,7 +90,7 @@ builder.Services.AddHttpClient("JobScraper", client =>
     client.DefaultRequestHeaders.Accept.ParseAdd("text/html,application/xhtml+xml");
 });
 builder.Services.AddScoped<IJobScraperService, JobScraperService>();
-builder.Services.AddScoped<MatcherService>();
+builder.Services.AddScoped<IMatcherService, MatcherService>();
 
 // ── Job Search Providers ──────────────────────────────────────────────────────
 builder.Services.AddHttpClient<RemotiveJobSearchProvider>();
@@ -107,7 +107,7 @@ builder.Services.AddScoped<IJobSearchProvider, HimalayasJobSearchProvider>();
 builder.Services.AddScoped<IJobSearchProvider, JSearchJobSearchProvider>();
 builder.Services.AddScoped<IJobSearchProvider, AdzunaJobSearchProvider>();
 builder.Services.AddScoped<IJobSearchProvider, TheMuseJobSearchProvider>();
-builder.Services.AddScoped<JobSearchService>();
+builder.Services.AddScoped<IJobSearchService, JobSearchService>();
 
 // ── Controllers ───────────────────────────────────────────────────────────────
 builder.Services.AddControllers();

@@ -3,7 +3,7 @@ using ResumeMatcher.Api.Application.Interfaces;
 
 namespace ResumeMatcher.Api.Application.Services;
 
-public class MatcherService
+public class MatcherService : IMatcherService
 {
     private readonly IPdfExtractorService _pdfExtractor;
     private readonly IJobScraperService _jobScraper;

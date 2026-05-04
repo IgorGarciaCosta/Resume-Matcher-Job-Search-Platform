@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ResumeMatcher.Api.Application.DTOs;
-using ResumeMatcher.Api.Application.Services;
+using ResumeMatcher.Api.Application.Interfaces;
 
 namespace ResumeMatcher.Api.Controllers;
 
@@ -8,9 +8,9 @@ namespace ResumeMatcher.Api.Controllers;
 [Route("api/[controller]")]
 public class MatcherController : ControllerBase
 {
-    private readonly MatcherService _matcherService;
+    private readonly IMatcherService _matcherService;
 
-    public MatcherController(MatcherService matcherService)
+    public MatcherController(IMatcherService matcherService)
     {
         _matcherService = matcherService;
     }
