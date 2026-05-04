@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback, useMemo, memo } from "react";
-import { MeshPhongMaterial } from "three";
 import type { CountryCoord } from "../data/countryCoordinates";
 import styles from "./GlobeView.module.css";
 
@@ -39,12 +38,6 @@ const HIGHLIGHT_SIDE = "rgba(124, 92, 252, 0.35)";
 const RING_COLOR = "rgba(124, 92, 252, 0.8)";
 const ATMOSPHERE_COLOR = "#7c5cfc";
 
-const globeMaterial = new MeshPhongMaterial({
-  color: "#181825",
-  transparent: true,
-  opacity: 0.95,
-});
-
 export default memo(function GlobeView({
   selectedCountry,
   globeFilterIso: externalFilterIso,
@@ -58,6 +51,8 @@ export default memo(function GlobeView({
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [GlobeComponent, setGlobeComponent] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [globeMaterial, setGlobeMaterial] = useState<any>(null);
   const [hoveredCountry, setHoveredCountry] = useState<GeoFeature | null>(null);
   const [clickedIso, setClickedIso] = useState<string | null>(null);
   const [clickedName, setClickedName] = useState("");
@@ -70,11 +65,20 @@ export default memo(function GlobeView({
     }
   }, [externalFilterIso]);
 
-  // Dynamically import react-globe.gl (heavy dep, code-split)
+  // Dynamically import react-globe.gl and three (heavy deps, code-split)
   useEffect(() => {
-    import("react-globe.gl").then((mod) => {
-      setGlobeComponent(() => mod.default);
-    });
+    Promise.all([import("react-globe.gl"), import("three")]).then(
+      ([globeMod, threeMod]) => {
+        setGlobeMaterial(
+          new threeMod.MeshPhongMaterial({
+            color: "#181825",
+            transparent: true,
+            opacity: 0.95,
+          }),
+        );
+        setGlobeComponent(() => globeMod.default);
+      },
+    );
   }, []);
 
   // Fetch GeoJSON countries
@@ -228,7 +232,7 @@ export default memo(function GlobeView({
     ];
   }, [selectedCountry]);
 
-  if (!GlobeComponent) {
+  if (!GlobeComponent || !globeMaterial) {
     return (
       <div ref={containerRef} className={styles.container}>
         <div className={styles.loading}>
